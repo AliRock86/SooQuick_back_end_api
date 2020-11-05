@@ -7,13 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class OrderInstruction extends Model
 {
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name'
-    ];
+    protected $guarded = [];
 
+    protected $hidden = [
+        'updated_at', 'created_at'
+    ];
 }
