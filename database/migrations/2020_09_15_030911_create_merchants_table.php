@@ -30,8 +30,6 @@ class CreateMerchantsTable extends Migration
             $table->longText('merchant_description')->nullable()->default(null);
             $table->text('facebook_url')->nullable()->default(null);
             $table->boolean('offer')->default(false);
-            $table->unsignedBigInteger('status_id');
-            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->timestamps();
         });
     }

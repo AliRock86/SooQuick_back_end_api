@@ -23,8 +23,10 @@ class CreateDeliveryPricesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('delivery_comp_id');
             $table->foreign('delivery_comp_id')->references('id')->on('delivery_companies')->onDelete('cascade');
-            $table->unsignedBigInteger('province_id');
-            $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
+            $table->unsignedBigInteger('from_region_id');
+            $table->foreign('from_region_id')->references('id')->on('regions')->onDelete('cascade');
+            $table->unsignedBigInteger('to_region_id');
+            $table->foreign('to_region_id')->references('id')->on('regions')->onDelete('cascade');
             $table->integer('delivery_price_value');
             $table->integer('delivery_price_weight_kilos')->default(0);
             $table->string('delivery_prices_description')->nullable()->default(null);

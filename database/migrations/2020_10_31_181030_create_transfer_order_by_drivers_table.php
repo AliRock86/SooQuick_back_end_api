@@ -26,6 +26,8 @@ class CreateTransferOrderByDriversTable extends Migration
             $table->unsignedBigInteger('driver_id');
             $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('cascade');
             $table->boolean('still_has_it')->default(true);
+            $table->unsignedBigInteger('status_id');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->timestamps();
         });
     }

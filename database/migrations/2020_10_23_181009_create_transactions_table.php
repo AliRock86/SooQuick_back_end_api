@@ -25,6 +25,7 @@ class CreateTransactionsTable extends Migration
             $table->foreign('source_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('destination_id');
             $table->foreign('destination_id')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('value');
             $table->timestamps();
         });
     }

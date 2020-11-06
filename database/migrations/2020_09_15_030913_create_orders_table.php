@@ -28,7 +28,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
             $table->unsignedBigInteger('delivery_price_id')->default(0);
-            $table->bigInteger('goods_price')->default(0);
+            $table->bigInteger('product_price')->default(0);
             $table->longText('serial_number');
             $table->unsignedBigInteger('status_id');
             $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');

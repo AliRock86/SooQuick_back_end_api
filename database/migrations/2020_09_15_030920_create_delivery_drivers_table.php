@@ -25,6 +25,8 @@ class CreateDeliveryDriversTable extends Migration
             $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('cascade');
             $table->unsignedBigInteger('order_id');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->unsignedBigInteger('status_id');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->timestamps();
         });
     }

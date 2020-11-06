@@ -23,6 +23,8 @@ class CreateActionsTable extends Migration
             $table->bigIncrements('id');
             $table->string('action_name');
             $table->string('action_name_ar');
+            $table->unsignedBigInteger('instruction_id');
+            $table->foreign('instruction_id')->references('id')->on('instructions')->onDelete('cascade');
             $table->timestamps();
         });
     }
