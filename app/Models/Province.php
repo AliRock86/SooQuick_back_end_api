@@ -24,4 +24,9 @@ class Province extends Model
         return $this->belongsTo('App\Models\Country');
     }
 
+    public function region()
+    {
+        return $this->hasMany('App\Models\Region');
+    }
+
 }

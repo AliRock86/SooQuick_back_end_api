@@ -13,4 +13,12 @@ class Instruction extends Model
         'updated_at', 'created_at'
     ];
 
+    public function action()
+    {
+        return $this->hasMany('App\Models\Action');
+    }
+    public function orderInstruction()
+    {
+        return $this->hasMany('App\Models\OrderInstruction');
+    }
 }

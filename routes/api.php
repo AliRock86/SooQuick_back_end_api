@@ -137,6 +137,7 @@ Route::name('addresses.')->prefix('addresses')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('merchants.')->prefix('merchants')->group(function () {
+    Route::patch('/{customerId}', [CustomerControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
     Route::get('/', 'MerchantControllerAPI@index')->name('index');
     Route::post('/', 'MerchantControllerAPI@store')->name('create');
     Route::get('/{merchant}', 'MerchantControllerAPI@show')->name('show');
@@ -163,11 +164,12 @@ Route::name('delivery-companies.')->prefix('delivery-companies')->group(function
 |--------------------------------------------------------------------------
  */
 Route::name('orders.')->prefix('orders')->group(function () {
-    Route::get('/', 'OrderControllerAPI@index')->name('index');
-    Route::post('/', 'OrderControllerAPI@store')->name('create');
-    Route::get('/{order}', 'OrderControllerAPI@show')->name('show');
-    Route::patch('/{order}', 'OrderControllerAPI@update')->name('update');
-    Route::delete('/{order}', 'OrderControllerAPI@destroy')->name('destroy');
+    Route::patch('/{customerId}', [OrderControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
+    Route::get('/', [OrderControllerAPI::class,'index'])->name('index');
+    Route::post('/', [OrderControllerAPI::class,'store'])->name('create');
+    Route::get('/{orderId}', [OrderControllerAPI::class,'show'])->name('show');
+    Route::patch('/{orderId}', [OrderControllerAPI::class,'update'])->name('update');
+    Route::delete('/{order}', [OrderControllerAPI::class,'destroy'])->name('destroy');
 });
 
 /*

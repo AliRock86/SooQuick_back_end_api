@@ -24,7 +24,7 @@ class CreateDeliveryCompaniesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('delivery_comp_barnd_name');
-            $table->string('delivery_comp_email',191)->nullable();
+            $table->string('delivery_comp_email',191)->nullable()->default(null);
             $table->bigInteger('delivery_comp_phone');
             $table->unique('delivery_comp_phone');
             $table->longText('delivery_comp_description')->nullable()->default(null);

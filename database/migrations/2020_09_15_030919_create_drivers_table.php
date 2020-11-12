@@ -27,7 +27,9 @@ class CreateDriversTable extends Migration
             $table->string('car_number');
             $table->string('car_owner_name');
             $table->string('car_owner_type');
-            $table->string('driver_description');
+            $table->string('driver_description')->nullable()->default(null);
+            $table->unsignedBigInteger('region_id');
+            $table->foreign('region_id')->references('id')->on('regions')->onDelete('cascade');
             $table->unsignedBigInteger('status_id');
             $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->timestamps();

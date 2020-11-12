@@ -13,4 +13,9 @@ class Permision extends Model
         'updated_at', 'created_at'
     ];
 
+    public function user()
+    {
+        return $this->hasOne('App\Models\User');
+    }
+
 }

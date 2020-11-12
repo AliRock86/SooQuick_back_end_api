@@ -13,4 +13,9 @@ class Role extends Model
         'updated_at', 'created_at'
     ];
 
+    public function user()
+    {
+        return $this->hasMany('App\Models\User');
+    }
+
 }

@@ -14,4 +14,9 @@ class StatusType extends Model
         'created_at', 'updated_at'
     ];
 
+    public function status()
+    {
+        return $this->hasMany('App\Models\Status');
+    }
+
 }

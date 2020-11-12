@@ -13,4 +13,9 @@ class Image extends Model
         'updated_at', 'created_at'
     ];
 
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
+
 }

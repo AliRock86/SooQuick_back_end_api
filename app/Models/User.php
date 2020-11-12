@@ -37,18 +37,7 @@ class User extends Authenticatable implements JWTSubject
         'password' => ['required','min:8','confirmed'],
         'otpNumber' =>['required|min:6|numeric']
     ];
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $guarded = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password', 'user_email', 'user_phone',
     ];
@@ -102,5 +91,20 @@ class User extends Authenticatable implements JWTSubject
     public function driver()
     {
         return $this->hasMany('App\Models\Driver');
+    }
+
+    public function transactionSource()
+    {
+        return $this->hasMany('App\Models\Driver','source_id');
+    }
+
+    public function transactionDestination()
+    {
+        return $this->hasMany('App\Models\Driver','destination_id');
+    }
+
+    public function wallet()
+    {
+        return $this->hasMany('App\Models\Wallet');
     }
 }
