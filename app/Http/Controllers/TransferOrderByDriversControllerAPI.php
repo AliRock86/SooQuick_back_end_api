@@ -31,15 +31,30 @@ class TransferOrderByDriversControllerAPI extends Controller
      * @param  \App\Http\Requests\TransferOrderByDriversRequest  $request
      * @return \App\Http\Resources\TransferOrderByDriversResource
      */
-    public function store(TransferOrderByDriversRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', TransferOrderByDrivers::class);
+        $validator = Validator::make($request->all(), TransferOrderByDrivers::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+            
+        $transferOrderByDrivers= new TransferOrderByDrivers;
+        $transferOrderByDrivers->order_id =$order_id;
+        $transferOrderByDrivers->driver_id = $request->driver_id;
+        $transferOrderByDrivers->still_has_it = $request->still_has_it;
+        $transferOrderByDrivers->status_id = $request->status_id;
+        $transferOrderByDrivers->save();
 
-        $transferOrderByDrivers = TransferOrderByDrivers::create($request->validated());
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
-        return new TransferOrderByDriversResource($transferOrderByDrivers);
-
-    }
+        }
 
     /**
      * Display the specified resource.

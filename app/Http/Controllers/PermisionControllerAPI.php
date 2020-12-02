@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Permision;
+use App\Model\Permision;
 use App\Http\Resources\PermisionResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermisionRequest;
@@ -31,15 +31,27 @@ class PermisionControllerAPI extends Controller
      * @param  \App\Http\Requests\PermisionRequest  $request
      * @return \App\Http\Resources\PermisionResource
      */
-    public function store(PermisionRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Permision::class);
-
-        $permision = Permision::create($request->validated());
-
-        return new PermisionResource($permision);
-
+        $validator = Validator::make($request->all(), Permision::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+  $permision= new Permision;
+  $permision->user_id =$user_id;
+  $permision->permision_name = $request->permision_name;
+  $permision->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
+    
 
     /**
      * Display the specified resource.

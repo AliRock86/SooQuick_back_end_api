@@ -31,13 +31,27 @@ class RegionControllerAPI extends Controller
      * @param  \App\Http\Requests\RegionRequest  $request
      * @return \App\Http\Resources\RegionResource
      */
-    public function store(RegionRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Region::class);
-
-        $region = Region::create($request->validated());
-
-        return new RegionResource($region);
+        $validator = Validator::make($request->all(), Region::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        
+            $region= new Region;
+            $region->user_id =$user_id;
+            $region->province_id = $request->province_id;
+            $region->region_name = $request->region_name;
+            $region->region_name_ar = $request->region_name_ar;
+            $region->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
@@ -47,10 +61,10 @@ class RegionControllerAPI extends Controller
      * @param  \App\Region  $region
      * @return \App\Http\Resources\RegionResource
      */
-    public function show($provinceId)
+    public function show($regionId)
     {
        // $this->authorize('view', $region);
-        $regions = Region::where('province_id',$provinceId)->get();
+        $regions = Region::where('province_id',$regionId)->get();
         return new RegionResource($regions);
 
     }

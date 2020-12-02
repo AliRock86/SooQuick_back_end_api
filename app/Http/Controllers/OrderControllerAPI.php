@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Order;
+use App\Model\Order;
 use App\Http\Resources\OrderResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
@@ -31,13 +31,26 @@ class OrderControllerAPI extends Controller
      * @param  \App\Http\Requests\OrderRequest  $request
      * @return \App\Http\Resources\OrderResource
      */
-    public function store(OrderRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Order::class);
-
-        $order = Order::create($request->validated());
-
-        return new OrderResource($order);
+        $validator = Validator::make($request->all(), Order::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+      $order = new Order;
+      $order->order_id = $order_id;
+      $order->action_id = $request->action_id;
+      $order->status_id = $request->status_id;
+      $order->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

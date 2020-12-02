@@ -31,15 +31,27 @@ class PriceControllerAPI extends Controller
      * @param  \App\Http\Requests\PriceRequest  $request
      * @return \App\Http\Resources\PriceResource
      */
-    public function store(PriceRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Price::class);
+        $validator = Validator::make($request->all(), Price::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+            
+            
+        $price= new Price;
+        $price->user_id =$user_id;
+        $price->permision_name = $request->permision_name;
+        $price->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
-        $price = Price::create($request->validated());
-
-        return new PriceResource($price);
-
-    }
+            }
 
     /**
      * Display the specified resource.

@@ -19,7 +19,7 @@ class StatusTypeControllerAPI extends Controller
     {
        // $this->authorize('viewAny', StatusType::class);
 
-        $statusType = StatusType::all();
+    $statusTypeType = StatusType::all();
 
         return new StatusTypeCollection($statusType);
 
@@ -31,25 +31,37 @@ class StatusTypeControllerAPI extends Controller
      * @param  \App\Http\Requests\StatusTypeRequest  $request
      * @return \App\Http\Resources\StatusTypeResource
      */
-    public function store(StatusTypeRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', StatusType::class);
-
-        $statusType = StatusType::create($request->validated());
-
-        return new StatusTypeResource($statusType);
+        $validator = Validator::make($request->all(), StatusType::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        
+       $statusType= new StatusType;
+       $statusType->user_id =$user_id;
+       $statusType->status_type_name = $request->status_type_name;
+       $statusType->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\StatusType  $statusType
+     * @param  \App\StatusType$StatusTypeType
      * @return \App\Http\Resources\StatusTypeResource
      */
-    public function show(StatusType $statusType)
+    public function show(StatusType$statusType)
     {
-        $this->authorize('view', $statusType);
+        $this->authorize('view',$statusType);
 
         return new StatusTypeResource($statusType);
 
@@ -59,14 +71,14 @@ class StatusTypeControllerAPI extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\StatusTypeRequest  $request
-     * @param  \App\StatusType  $statusType
+     * @param  \App\StatusType$StatusTypeType
      * @return \App\Http\Resources\StatusTypeResource
      */
-    public function update(StatusTypeRequest $request, StatusType $statusType)
+    public function update(StatusTypeRequest $request, StatusType$statusType)
     {
-        $this->authorize('update', $statusType);
+        $this->authorize('update',$statusType);
 
-        $statusType->update($request->validated());
+    $statusTypeType->update($request->validated());
 
         return new StatusTypeResource($statusType);
 
@@ -75,14 +87,14 @@ class StatusTypeControllerAPI extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\StatusType  $statusType
+     * @param  \App\StatusType$StatusTypeType
      * @return \App\Http\Resources\StatusTypeResource
      */
-    public function destroy(StatusType $statusType)
+    public function destroy(StatusType$statusType)
     {
-        $this->authorize('delete', $statusType);
+        $this->authorize('delete',$statusType);
 
-        $statusType->delete();
+    $statusTypeType->delete();
 
         return new StatusTypeResource($statusType);
 

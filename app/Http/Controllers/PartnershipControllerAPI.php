@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Partnership;
+use App\Model\Partnership;
 use App\Http\Resources\PartnershipResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PartnershipRequest;
@@ -31,14 +31,26 @@ class PartnershipControllerAPI extends Controller
      * @param  \App\Http\Requests\PartnershipRequest  $request
      * @return \App\Http\Resources\PartnershipResource
      */
-    public function store(PartnershipRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Partnership::class);
-
-        $partnership = Partnership::create($request->validated());
-
-        return new PartnershipResource($partnership);
-
+        $validator = Validator::make($request->all(), Partnership::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+    $partnership= new Partnership;
+    $partnership->user_id =$user_id;
+    $partnership->delivery_comp_id = $request->delivery_comp_id;
+    $partnership->merchant_id = $request->merchant_id;
+    $partnership->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
 
     /**

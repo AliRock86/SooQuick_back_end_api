@@ -137,7 +137,8 @@ Route::name('addresses.')->prefix('addresses')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('merchants.')->prefix('merchants')->group(function () {
-    Route::patch('/{customerId}', [CustomerControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
+    Route::patch('/create', [MerchantControllerAPI::class,'store'])->name('create')->middleware(['jwt.auth.owner']);
+    Route::patch('/{merchantId}', [MerchantControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
     Route::get('/', 'MerchantControllerAPI@index')->name('index');
     Route::post('/', 'MerchantControllerAPI@store')->name('create');
     Route::get('/{merchant}', 'MerchantControllerAPI@show')->name('show');
@@ -147,15 +148,28 @@ Route::name('merchants.')->prefix('merchants')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| DeliveryCompany endpoints
+| DeliveryCompany endpoints 
 |--------------------------------------------------------------------------
  */
-Route::name('delivery-companies.')->prefix('delivery-companies')->group(function () {
-    Route::get('/', 'DeliveryCompanyControllerAPI@index')->name('index');
-    Route::post('/', 'DeliveryCompanyControllerAPI@store')->name('create');
-    Route::get('/{deliveryCompany}', 'DeliveryCompanyControllerAPI@show')->name('show');
-    Route::patch('/{deliveryCompany}', 'DeliveryCompanyControllerAPI@update')->name('update');
-    Route::delete('/{deliveryCompany}', 'DeliveryCompanyControllerAPI@destroy')->name('destroy');
+Route::middleware(['jwt.auth.delivery-company'])->name('delivery-companies.')->prefix('delivery-companies')->group(function () {
+    Route::post('/', [DeliveryCompanyControllerAPI::class,'store'])->name('createCompany');
+    Route::patch('/', [DeliveryCompanyControllerAPI::class,'update'])->name('updateCompany');
+
+    Route::get('/', [CompanyDriversControllerAPI::class,'index'])->name('allDrivers');
+    Route::post('/', [DriverControllerAPI::class,'store'])->name('createDriver');
+    Route::patch('/{driverId}', [DriverControllerAPI::class,'update'])->name('update');
+    Route::get('/{driverId}', [DriverControllerAPI::class,'driverChangeStatus'])->name('driverChangeStatus');
+    Route::get('/{phoneNumber}', [DriverControllerAPI::class,'search'])->name('driverSearch');
+    
+    Route::post('/', [DeliveryDriversControllerAPI::class,'store'])->name('assignPackegs');
+    Route::patch('/', [DeliveryDriversControllerAPI::class,'update'])->name('updateAssignedPackegs');
+    Route::get('/{statusId}', [DeliveryDriversControllerAPI::class,'getPackegsByDriver'])->name('getPackegsByDriver');
+    Route::get('/{dliveryId}', [DeliveryDriversControllerAPI::class,'destroy'])->name('deleteAssignedPackegs');
+
+    Route::post('/', [DeliveryPriceControllerAPI::class,'store'])->name('addPrice');
+    Route::patch('/', [DeliveryPriceControllerAPI::class,'update'])->name('updatePrice');
+    Route::get('/', [DeliveryPriceControllerAPI::class,'getAllByCompany'])->name('getAllPrices');
+    Route::get('/{priceId}', [DeliveryPriceControllerAPI::class,'destroy'])->name('deletePrice');
 });
 
 /*

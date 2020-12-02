@@ -31,14 +31,29 @@ class StatusControllerAPI extends Controller
      * @param  \App\Http\Requests\StatusRequest  $request
      * @return \App\Http\Resources\StatusResource
      */
-    public function store(StatusRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Status::class);
-
-        $status = Status::create($request->validated());
-
-        return new StatusResource($status);
-
+        $validator = Validator::make($request->all(), Status::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+     $status= new Status;
+     $status->user_id =$user_id;
+     $status->status_type_id = $request->status_type_id;
+     $status->status_name = $request->status_name;
+     $status->status_name_ar = $request->status_name_ar;
+     $status->status_color = $request->status_color;
+     $status->status_icon = $request->status_icon;
+     $status->save();
+         return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
 
     /**

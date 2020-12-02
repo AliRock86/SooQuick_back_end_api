@@ -32,12 +32,26 @@ class ProvinceControllerAPI extends Controller
      * @return \App\Http\Resources\ProvinceResource
      */
     public function store(ProvinceRequest $request)
-    {
-        $this->authorize('create', Province::class);
-
-        $province = Province::create($request->validated());
-
-        return new ProvinceResource($province);
+    {    
+          $validator = Validator::make($request->all(), Province::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        
+        $province= new Province;
+        $province->user_id =$user_id;
+        $province->country_id = $request->country_id;
+        $province->province_name = $request->province_name;
+        $province->province_name_ar = $request->province_name_ar;
+        $province->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 

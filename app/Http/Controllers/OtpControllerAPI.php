@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Otp;
+use App\Model\Otp;
 use App\Http\Resources\OtpResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OtpRequest;
@@ -31,13 +31,25 @@ class OtpControllerAPI extends Controller
      * @param  \App\Http\Requests\OtpRequest  $request
      * @return \App\Http\Resources\OtpResource
      */
-    public function store(OtpRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Otp::class);
-
-        $otp = Otp::create($request->validated());
-
-        return new OtpResource($otp);
+        $validator = Validator::make($request->all(), Otp::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+     $Otp= new Otp;
+     $otp->user_id =$user_id;
+     $otp->verify_number = $request->verify_number;
+     $otp->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

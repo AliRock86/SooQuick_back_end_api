@@ -31,44 +31,54 @@ class DeliveryCompanyControllerAPI extends Controller
      * @param  \App\Http\Requests\DeliveryCompanyRequest  $request
      * @return \App\Http\Resources\DeliveryCompanyResource
      */
-    public function store(DeliveryCompanyRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', DeliveryCompany::class);
-
-        $deliveryCompany = DeliveryCompany::create($request->validated());
-
-        return new DeliveryCompanyResource($deliveryCompany);
+        $validator = Validator::make($request->all(), DeliveryCompany::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        $user = JWTAuth::parseToken()->authenticate();
+        $company = new DeliveryCompany;
+        $company->user_id = $user->id;
+        $company->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
+        $company->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
+        $company->delivery_comp_phone = $request->delivery_comp_phone;
+        $company->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
+        $company->status_id = 1;
+        $company->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\DeliveryCompany  $deliveryCompany
-     * @return \App\Http\Resources\DeliveryCompanyResource
-     */
-    public function show(DeliveryCompany $deliveryCompany)
+
+    public function update(Request $request)
     {
-        $this->authorize('view', $deliveryCompany);
-
-        return new DeliveryCompanyResource($deliveryCompany);
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\DeliveryCompanyRequest  $request
-     * @param  \App\DeliveryCompany  $deliveryCompany
-     * @return \App\Http\Resources\DeliveryCompanyResource
-     */
-    public function update(DeliveryCompanyRequest $request, DeliveryCompany $deliveryCompany)
-    {
-        $this->authorize('update', $deliveryCompany);
-
-        $deliveryCompany->update($request->validated());
-
-        return new DeliveryCompanyResource($deliveryCompany);
+        $validator = Validator::make($request->all(), DeliveryCompany::VALIDATION_RULE_UPDATE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        $company = DeliveryCompany::find($request->company_id);
+        $company->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
+        $company->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
+        $company->delivery_comp_phone = $request->delivery_comp_phone;
+        $company->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
+        $company->status_id = $request->status_id;
+        $company->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

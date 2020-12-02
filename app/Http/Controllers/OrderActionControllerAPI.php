@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\OrderAction;
+use App\Model\OrderAction;
 use App\Http\Resources\OrderActionResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderActionRequest;
@@ -31,13 +31,26 @@ class OrderActionControllerAPI extends Controller
      * @param  \App\Http\Requests\OrderActionRequest  $request
      * @return \App\Http\Resources\OrderActionResource
      */
-    public function store(OrderActionRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', OrderAction::class);
-
-        $orderAction = OrderAction::create($request->validated());
-
-        return new OrderActionResource($orderAction);
+        $validator = Validator::make($request->all(), OrderAction::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+        $orderAction = new OrderAction;
+        $orderAction->order_id = $order_id;
+        $orderAction->action_id = $request->action_id;
+        $orderAction->status_id = $request->status_id;
+        $orderAction->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

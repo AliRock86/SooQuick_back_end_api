@@ -31,14 +31,21 @@ class DeliveryPriceControllerAPI extends Controller
      * @param  \App\Http\Requests\DeliveryPriceRequest  $request
      * @return \App\Http\Resources\DeliveryPriceResource
      */
-    public function store(DeliveryPriceRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', DeliveryPrice::class);
-
-        $deliveryPrice = DeliveryPrice::create($request->validated());
-
-        return new DeliveryPriceResource($deliveryPrice);
-
+        $user = JWTAuth::parseToken()->authenticate();
+        $deliveryPrice = new DeliveryCompany;
+        $deliveryPrice->user_id = $user->id;
+        $deliveryPrice->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
+        $deliveryPrice->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
+        $deliveryPrice->delivery_comp_phone = $request->delivery_comp_phone;
+        $deliveryPrice->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
+        $deliveryPrice->status_id = 1;
+        $deliveryPrice->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
 
     /**

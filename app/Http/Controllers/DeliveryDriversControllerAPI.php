@@ -31,14 +31,21 @@ class DeliveryDriversControllerAPI extends Controller
      * @param  \App\Http\Requests\DeliveryDriversRequest  $request
      * @return \App\Http\Resources\DeliveryDriversResource
      */
-    public function store(DeliveryDriversRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', DeliveryDrivers::class);
-
-        $deliveryDrivers = DeliveryDrivers::create($request->validated());
-
-        return new DeliveryDriversResource($deliveryDrivers);
-
+        $user = JWTAuth::parseToken()->authenticate();
+        $deliveryDrivers = new DeliveryCompany;
+        $deliveryDrivers->user_id = $user->id;
+        $deliveryDrivers->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
+        $deliveryDrivers->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
+        $deliveryDrivers->delivery_comp_phone = $request->delivery_comp_phone;
+        $deliveryDrivers->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
+        $deliveryDrivers->status_id = 1;
+        $deliveryDrivers->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
 
     /**

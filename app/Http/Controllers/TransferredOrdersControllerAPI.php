@@ -33,11 +33,26 @@ class TransferredOrdersControllerAPI extends Controller
      */
     public function store(TransferredOrdersRequest $request)
     {
-        $this->authorize('create', TransferredOrders::class);
+        $validator = Validator::make($request->all(), TransferredOrders::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                
+            $transferredOrders= new TransferredOrders;
+            $transferredOrders->order_id =$order_id;
+            $transferredOrders->order_id = $request->order_id;
+            $transferredOrders->from_comp_id = $request->from_comp_id;
+            $transferredOrders->to_comp_id = $request->to_comp_id;
+            $transferredOrders->save();
 
-        $transferredOrders = TransferredOrders::create($request->validated());
-
-        return new TransferredOrdersResource($transferredOrders);
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\OrderInstruction;
+use App\Model\OrderInstruction;
 use App\Http\Resources\OrderInstructionResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderInstructionRequest;
@@ -19,7 +19,7 @@ class OrderInstructionControllerAPI extends Controller
     {
         $this->authorize('viewAny', OrderInstruction::class);
 
-        $orderInstruction = OrderInstruction::all();
+       $orderInstructionInstruction = OrderInstruction::all();
 
         return new OrderInstructionCollection($orderInstruction);
 
@@ -31,25 +31,37 @@ class OrderInstructionControllerAPI extends Controller
      * @param  \App\Http\Requests\OrderInstructionRequest  $request
      * @return \App\Http\Resources\OrderInstructionResource
      */
-    public function store(OrderInstructionRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', OrderInstruction::class);
-
-        $orderInstruction = OrderInstruction::create($request->validated());
-
-        return new OrderInstructionResource($orderInstruction);
+        $validator = Validator::make($request->all(), OrderInstruction::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+     $orderInstruction = new OrderInstruction;
+     $orderInstruction->order_id =$orderInstruction_id;
+     $orderInstruction->instruction_id = $request->instruction_id;
+     $orderInstruction->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\OrderInstruction  $orderInstruction
+     * @param  \App\OrderInstruction $orderInstructionInstruction
      * @return \App\Http\Resources\OrderInstructionResource
      */
-    public function show(OrderInstruction $orderInstruction)
+    public function show(OrderInstruction$orderInstructionInstruction)
     {
-        $this->authorize('view', $orderInstruction);
+        $this->authorize('view',$orderInstructionInstruction);
 
         return new OrderInstructionResource($orderInstruction);
 
@@ -59,14 +71,14 @@ class OrderInstructionControllerAPI extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\OrderInstructionRequest  $request
-     * @param  \App\OrderInstruction  $orderInstruction
+     * @param  \App\OrderInstruction $orderInstructionInstruction
      * @return \App\Http\Resources\OrderInstructionResource
      */
-    public function update(OrderInstructionRequest $request, OrderInstruction $orderInstruction)
+    public function update(OrderInstructionRequest $request, OrderInstruction$orderInstructionInstruction)
     {
-        $this->authorize('update', $orderInstruction);
+        $this->authorize('update',$orderInstructionInstruction);
 
-        $orderInstruction->update($request->validated());
+       $orderInstructionInstruction->update($request->validated());
 
         return new OrderInstructionResource($orderInstruction);
 
@@ -75,14 +87,14 @@ class OrderInstructionControllerAPI extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\OrderInstruction  $orderInstruction
+     * @param  \App\OrderInstruction $orderInstructionInstruction
      * @return \App\Http\Resources\OrderInstructionResource
      */
-    public function destroy(OrderInstruction $orderInstruction)
+    public function destroy(OrderInstruction$orderInstructionInstruction)
     {
-        $this->authorize('delete', $orderInstruction);
+        $this->authorize('delete',$orderInstructionInstruction);
 
-        $orderInstruction->delete();
+       $orderInstructionInstruction->delete();
 
         return new OrderInstructionResource($orderInstruction);
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Bill;
+use App\Model\Bill;
 use App\Http\Resources\BillResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BillRequest;
@@ -31,13 +31,27 @@ class BillControllerAPI extends Controller
      * @param  \App\Http\Requests\BillRequest  $request
      * @return \App\Http\Resources\BillResource
      */
-    public function store(BillRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Bill::class);
+       
+         
+        $validator = Validator::make($request->all(), Bill::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                    $bill= new Bill;
+                    $bill->name =$name;
+                    $bill->save();
 
-        $bill = Bill::create($request->validated());
-
-        return new BillResource($bill);
+                        return response()->json([
+                            'success' => true,
+                            'data' => 'done',
+                        ], 200);
 
     }
 

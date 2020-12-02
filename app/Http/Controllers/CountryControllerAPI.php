@@ -31,14 +31,31 @@ class CountryControllerAPI extends Controller
      * @param  \App\Http\Requests\CountryRequest  $request
      * @return \App\Http\Resources\CountryResource
      */
-    public function store(CountryRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Country::class);
+        $validator = Validator::make($request->all(), Country::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                $country= new CompanyDrivers;
+                $country->addressable_id =$countryable_id;
+                $country->addressable_type = $request->addressable_type;
+                $country->region_id = $request->region_id;
+                $country->long = $request->long;
+                $country->lat = $request->lat;
+                $country->lat = $request->lat;
+                $country->address_descraption = $request->address_descraption;
+                $country->save();
 
-        $country = Country::create($request->validated());
-
-        return new CountryResource($country);
-
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
     }
 
     /**
@@ -62,14 +79,32 @@ class CountryControllerAPI extends Controller
      * @param  \App\Country  $country
      * @return \App\Http\Resources\CountryResource
      */
-    public function update(CountryRequest $request, Country $country)
+   
+    public function update(Request $request)
     {
-        $this->authorize('update', $country);
+        $validator = Validator::make($request->all(), Country::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                $country= new CompanyDrivers;
+                $country->addressable_id =$countryable_id;
+                $country->addressable_type = $request->addressable_type;
+                $country->region_id = $request->region_id;
+                $country->long = $request->long;
+                $country->lat = $request->lat;
+                $country->lat = $request->lat;
+                $country->address_descraption = $request->address_descraption;
+                $country->save();
 
-        $country->update($request->validated());
-
-        return new CountryResource($country);
-
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
     }
 
     /**

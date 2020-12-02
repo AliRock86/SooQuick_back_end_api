@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Role;
+use App\Models\Role;
 use App\Http\Resources\RoleResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
@@ -31,13 +31,26 @@ class RoleControllerAPI extends Controller
      * @param  \App\Http\Requests\RoleRequest  $request
      * @return \App\Http\Resources\RoleResource
      */
-    public function store(RoleRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Role::class);
-
-        $role = Role::create($request->validated());
-
-        return new RoleResource($role);
+        
+        $validator = Validator::make($request->all(), Role::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+    $role= new Role;
+    $role->user_id =$user_id;
+    $role->role_name = $request->role_name;
+    $role->save();
+         return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

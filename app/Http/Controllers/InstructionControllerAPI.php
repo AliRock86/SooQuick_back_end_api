@@ -31,13 +31,21 @@ class InstructionControllerAPI extends Controller
      * @param  \App\Http\Requests\InstructionRequest  $request
      * @return \App\Http\Resources\InstructionResource
      */
-    public function store(InstructionRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Instruction::class);
-
-        $instruction = Instruction::create($request->validated());
-
-        return new InstructionResource($instruction);
+        $user = JWTAuth::parseToken()->authenticate();
+        $instruction= new DeliveryCompany;
+        $instruction->user_id = $user->id;
+        $instruction->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
+        $instruction->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
+        $instruction->delivery_comp_phone = $request->delivery_comp_phone;
+        $instruction->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
+        $instruction->status_id = 1;
+        $instruction->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

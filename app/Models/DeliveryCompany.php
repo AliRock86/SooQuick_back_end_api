@@ -15,7 +15,7 @@ class DeliveryCompany extends Model
 
     public const VALIDATION_RULE_UPDATE = [
         'id' => ['required','numeric'],
-        'user_id' => ['required','numeric'],
+        'company_id' => ['required','numeric'],
         'delivery_comp_barnd_name' => ['required'],
         'delivery_comp_phone' => ['required','numeric'],
         'delivery_comp_barnd_name' => ['required'],

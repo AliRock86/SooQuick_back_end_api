@@ -19,7 +19,7 @@ class TransactionControllerAPI extends Controller
     {
         $this->authorize('viewAny', Transaction::class);
 
-        $transaction = Transaction::all();
+       $transaction = Transaction::all();
 
         return new TransactionCollection($transaction);
 
@@ -31,25 +31,38 @@ class TransactionControllerAPI extends Controller
      * @param  \App\Http\Requests\TransactionRequest  $request
      * @return \App\Http\Resources\TransactionResource
      */
-    public function store(TransactionRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Transaction::class);
+        $validator = Validator::make($request->all(), Transaction::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        
+        $transaction= new Transaction;
+        $transaction->source_id =$source_id;
+        $transaction->destination_id = $request->destination_id;
+        $transaction->value = $request->value;
+        $transaction->save();
 
-        $transaction = Transaction::create($request->validated());
-
-        return new TransactionResource($transaction);
-
+         return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Transaction $transaction
      * @return \App\Http\Resources\TransactionResource
      */
-    public function show(Transaction $transaction)
+    public function show(Transaction$transaction)
     {
-        $this->authorize('view', $transaction);
+        $this->authorize('view',$transaction);
 
         return new TransactionResource($transaction);
 
@@ -59,14 +72,14 @@ class TransactionControllerAPI extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\TransactionRequest  $request
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Transaction $transaction
      * @return \App\Http\Resources\TransactionResource
      */
-    public function update(TransactionRequest $request, Transaction $transaction)
+    public function update(TransactionRequest $request, Transaction$transaction)
     {
-        $this->authorize('update', $transaction);
+        $this->authorize('update',$transaction);
 
-        $transaction->update($request->validated());
+       $transaction->update($request->validated());
 
         return new TransactionResource($transaction);
 
@@ -75,14 +88,14 @@ class TransactionControllerAPI extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Transaction $transaction
      * @return \App\Http\Resources\TransactionResource
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(Transaction$transaction)
     {
-        $this->authorize('delete', $transaction);
+        $this->authorize('delete',$transaction);
 
-        $transaction->delete();
+       $transaction->delete();
 
         return new TransactionResource($transaction);
 

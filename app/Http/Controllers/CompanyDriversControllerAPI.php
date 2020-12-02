@@ -17,9 +17,9 @@ class CompanyDriversControllerAPI extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', CompanyDrivers::class);
-
-        $companyDrivers = CompanyDrivers::all();
+        $user = JWTAuth::parseToken()->authenticate();
+        $companyDrivers = CompanyDrivers::with(['driver','deliveryComp'])
+        ->where('delivery_comp_id',$user->deliveryComp->id);
 
         return new CompanyDriversCollection($companyDrivers);
 
@@ -31,14 +31,31 @@ class CompanyDriversControllerAPI extends Controller
      * @param  \App\Http\Requests\CompanyDriversRequest  $request
      * @return \App\Http\Resources\CompanyDriversResource
      */
-    public function store(CompanyDriversRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', CompanyDrivers::class);
+        $validator = Validator::make($request->all(), CompanyDrivers::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                $companyDrivers= new CompanyDrivers;
+                $companyDrivers->addressable_id =$companyDriversable_id;
+                $companyDrivers->addressable_type = $request->addressable_type;
+                $companyDrivers->region_id = $request->region_id;
+                $companyDrivers->long = $request->long;
+                $companyDrivers->lat = $request->lat;
+                $companyDrivers->lat = $request->lat;
+                $companyDrivers->address_descraption = $request->address_descraption;
+                $companyDrivers->save();
 
-        $companyDrivers = CompanyDrivers::create($request->validated());
-
-        return new CompanyDriversResource($companyDrivers);
-
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
     }
 
     /**

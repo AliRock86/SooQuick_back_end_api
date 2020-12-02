@@ -33,13 +33,24 @@ class CustomerControllerAPI extends Controller
      * @param  \App\Http\Requests\CustomerRequest  $request
      * @return \App\Http\Resources\CustomerResource
      */
-    public function store(CustomerRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Customer::class);
-
-        $customer = Customer::create($request->validated());
-
-        return new CustomerResource($customer);
+        $validator = Validator::make($request->all(), Customer::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+        $customer = new Customer;
+        $customer->customer_name = $request->customer_name;
+        $customer->customer_phone_1 = $request->customer_phone_1;
+        $customer->customer_phone_2 = $request->customer_phone_2;
+        $customer->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

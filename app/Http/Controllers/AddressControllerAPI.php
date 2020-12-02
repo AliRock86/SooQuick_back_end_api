@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Address;
+use App\Model\Address;
 use App\Http\Resources\AddressResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AddressRequest;
@@ -31,15 +31,34 @@ class AddressControllerAPI extends Controller
      * @param  \App\Http\Requests\AddressRequest  $request
      * @return \App\Http\Resources\AddressResource
      */
-    public function store(AddressRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Address::class);
 
-        $address = Address::create($request->validated());
+        
+        $validator = Validator::make($request->all(), Address::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                $address= new Address;
+                $address->addressable_id =$addressable_id;
+                $address->addressable_type = $request->addressable_type;
+                $address->region_id = $request->region_id;
+                $address->long = $request->long;
+                $address->lat = $request->lat;
+                $address->lat = $request->lat;
+                $address->address_descraption = $request->address_descraption;
+                $address->save();
 
-        return new AddressResource($address);
-
-    }
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
+        }
 
     /**
      * Display the specified resource.
@@ -64,11 +83,29 @@ class AddressControllerAPI extends Controller
      */
     public function update(AddressRequest $request, Address $address)
     {
-        $this->authorize('update', $address);
+        $validator = Validator::make($request->all(), Address::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                $address= Address::find($request->address_id);
+                $address->addressable_id =$addressable_id;
+                $address->addressable_type = $request->addressable_type;
+                $address->region_id = $request->region_id;
+                $address->long = $request->long;
+                $address->lat = $request->lat;
+                $address->lat = $request->lat;
+                $address->address_descraption = $request->address_descraption;
+                $address->save();
 
-        $address->update($request->validated());
-
-        return new AddressResource($address);
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
 
     }
 

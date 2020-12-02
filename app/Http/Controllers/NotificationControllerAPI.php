@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Notification;
+use App\Model\Notification;
 use App\Http\Resources\NotificationResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NotificationRequest;
@@ -31,13 +31,27 @@ class NotificationControllerAPI extends Controller
      * @param  \App\Http\Requests\NotificationRequest  $request
      * @return \App\Http\Resources\NotificationResource
      */
-    public function store(NotificationRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Notification::class);
-
-        $notification = Notification::create($request->validated());
-
-        return new NotificationResource($notification);
+        $validator = Validator::make($request->all(), Notification::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+        $notification = new Notification;
+        $notification->user_id = $user->id;
+        $notification->notification_type_id = $request->notification_type_id;
+        $notification->notification_title = $request->notification_title;
+        $notification->notification_body = $request->notification_body;
+        $notification->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 

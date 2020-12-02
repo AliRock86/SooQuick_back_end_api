@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\NotificationType;
+use App\Model\NotificationType;
 use App\Http\Resources\NotificationTypeResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NotificationTypeRequest;
@@ -19,7 +19,7 @@ class NotificationTypeControllerAPI extends Controller
     {
         $this->authorize('viewAny', NotificationType::class);
 
-        $notificationType = NotificationType::all();
+       $notificationTypeType = NotificationType::all();
 
         return new NotificationTypeCollection($notificationType);
 
@@ -31,25 +31,38 @@ class NotificationTypeControllerAPI extends Controller
      * @param  \App\Http\Requests\NotificationTypeRequest  $request
      * @return \App\Http\Resources\NotificationTypeResource
      */
-    public function store(NotificationTypeRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', NotificationType::class);
+        $validator = Validator::make($request->all(), NotificationType::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        $user = JWTAuth::parseToken()->authenticate();
+       $notificationType = new Notification;
+       $notificationType->user_id = $user->id;
+       $notificationType->notification_type_name = $request->notification_type_name;
+       $notificationType->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
-        $notificationType = NotificationType::create($request->validated());
-
-        return new NotificationTypeResource($notificationType);
 
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\NotificationType  $notificationType
+     * @param  \App\NotificationType $notificationTypeType
      * @return \App\Http\Resources\NotificationTypeResource
      */
-    public function show(NotificationType $notificationType)
+    public function show(NotificationType$notificationTypeType)
     {
-        $this->authorize('view', $notificationType);
+        $this->authorize('view',$notificationTypeType);
 
         return new NotificationTypeResource($notificationType);
 
@@ -59,14 +72,14 @@ class NotificationTypeControllerAPI extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\NotificationTypeRequest  $request
-     * @param  \App\NotificationType  $notificationType
+     * @param  \App\NotificationType $notificationTypeType
      * @return \App\Http\Resources\NotificationTypeResource
      */
-    public function update(NotificationTypeRequest $request, NotificationType $notificationType)
+    public function update(NotificationTypeRequest $request, NotificationType$notificationTypeType)
     {
-        $this->authorize('update', $notificationType);
+        $this->authorize('update',$notificationTypeType);
 
-        $notificationType->update($request->validated());
+       $notificationTypeType->update($request->validated());
 
         return new NotificationTypeResource($notificationType);
 
@@ -75,14 +88,14 @@ class NotificationTypeControllerAPI extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\NotificationType  $notificationType
+     * @param  \App\NotificationType $notificationTypeType
      * @return \App\Http\Resources\NotificationTypeResource
      */
-    public function destroy(NotificationType $notificationType)
+    public function destroy(NotificationType$notificationTypeType)
     {
-        $this->authorize('delete', $notificationType);
+        $this->authorize('delete',$notificationTypeType);
 
-        $notificationType->delete();
+       $notificationTypeType->delete();
 
         return new NotificationTypeResource($notificationType);
 

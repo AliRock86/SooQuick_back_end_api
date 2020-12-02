@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Offer;
+use App\Model\Offer;
 use App\Http\Resources\OfferResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OfferRequest;
@@ -31,16 +31,29 @@ class OfferControllerAPI extends Controller
      * @param  \App\Http\Requests\OfferRequest  $request
      * @return \App\Http\Resources\OfferResource
      */
-    public function store(OfferRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Offer::class);
-
-        $offer = Offer::create($request->validated());
-
-        return new OfferResource($offer);
+        $validator = Validator::make($request->all(), Offer::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+     
+        $offer = new Offer;
+        $offer->merchant_id = $merchant_id;
+        $offer->region_id = $request->region_id;
+        $offer->status_id = $request->status_id;
+        $offer->notification_body = $request->notification_body;
+        $offer->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
-
     /**
      * Display the specified resource.
      *
