@@ -10,6 +10,7 @@ use App\Http\Requests\CustomerRequest;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\Collections\CustomerCollection;
 
+
 class CustomerControllerAPI extends Controller
 {
     /**
@@ -35,22 +36,35 @@ class CustomerControllerAPI extends Controller
      */
     public function store(Request $request)
     {
+
+
         $validator = Validator::make($request->all(), Customer::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
+       
+       
+
+         if($validator->fails())
+        {
             return response()->json([
                 'success' => false,
                 'data' => $validator->messages(),
             ], 400);
+
         }
-        $customer = new Customer;
+    
+       
+       
+
+        $customer= new Customer;
         $customer->customer_name = $request->customer_name;
-        $customer->customer_phone_1 = $request->customer_phone_1;
+        $customer->customer_phone_1= $request->customer_phone_1;
         $customer->customer_phone_2 = $request->customer_phone_2;
         $customer->save();
+
         return response()->json([
             'success' => true,
-            'data' => 'done',
+            'data' =>null,
         ], 200);
+
 
     }
 
@@ -75,22 +89,34 @@ class CustomerControllerAPI extends Controller
      * @param  \App\Customer  $customer
      * @return \App\Http\Resources\CustomerResource
      */
-    public function update(Request $request)
+    public function update(Request $request,$id)
     {
-        //$this->authorize('update', $customer);
-        $validator = Validator::make($request->all(), Customer::VALIDATION_RULE_UPDATE);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-         Customer::find($request->id)->update($request->all());
+        $validator = Validator::make($request->all(), Customer::VALIDATION_RULE_STORE);
+       
+       
 
-        return response()->json([
-            'success' => true,
-            'data' => null,
-        ], 200);
+        if($validator->fails())
+       {
+           return response()->json([
+               'success' => false,
+               'data' => $validator->messages(),
+           ], 400);
+
+       }
+   
+      
+      
+
+       $customer= Customer::find($id);
+       $customer->customer_name = $request->customer_name;
+       $customer->customer_phone_1= $request->customer_phone_1;
+       $customer->customer_phone_2 = $request->customer_phone_2;
+       $customer->save();
+
+       return response()->json([
+           'success' => true,
+           'data' =>null,
+       ], 200);
 
     }
 

@@ -24,36 +24,55 @@ class UserControllerAPI extends Controller
     public function store(Request $request)
     {
         
-        $validator = Validator::make($request->all(), User::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-
+   
+       
+;
         $user = new User;
         $user->full_name = $request->full_name;
         $user->user_email = ($request->user_email) ? $request->user_email : 'null';
         $user->password = app('hash')->make($request->password);
         $user->user_phone = $request->user_phone;
-        $user->role_id = 1;
+        $user->role_id = $request->role_id;
         $user->status_id = 1;
         $user->mobile_token = md5(rand(1, 10) . microtime());
         $user->permision_id = 1;
-        $sms_content = mt_rand(19999, 999999);
+        $sms_content =111111;
+        //$sms_content = mt_rand(19999, 999999);
 
         try {
             DB::beginTransaction();
             $user->save();
+
+            if($request->long==null || $request->lat==null)
+            {
+                $ip =$_SERVER['REMOTE_ADDR'];
+                $access_key = '404b133e44aa0ced6faaf521cb09368c';
+                $ch = curl_init('http://api.ipstack.com/'.$ip.'?access_key='.$access_key.'');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $json = curl_exec($ch);
+                curl_close($ch);
+                $api_result = json_decode($json, true);
+                $long=$api_result['longitude'];
+                $lat=$api_result['latitude'];
+                
+        
+            }
+            else
+            {
+                $long=$request->long;
+                $lat=$request->lat;
+
+
+            }
             $user->address()->create(
                 [
                     'region_id' => $request->region_id,
-                    'long' => $request->long,
-                    'lat' => $request->lat,
+                    'long' =>$long,
+                    'lat' => $lat,
                     'address_descraption' => (!$request->address_descraption) ? $request->address_descraption : 'aaa',
                 ]);
+         if($request->images)
+         {
             if (count($request->images) !== 0) {
                 $upload = new UploadImageController;
                 $path = $upload->uploadInner($request);
@@ -62,35 +81,38 @@ class UserControllerAPI extends Controller
                         'image_url' => $path[0],
                     ]);
             }
+         }
 
-           // Otp::create(['user_id' => $user->id, 'verify_number' => $sms_content]);
+        Otp::create(['user_id' => $user->id, 'verify_number' => $sms_content]);
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollback();
-            return response()->json([
-                'success' => false,
-                'data' => $e,
-            ], 400);
+            return false;
         }
         DB::commit();
         $credentials = $request->only(['user_phone', 'password']);
         $token = JWTAuth::attempt($credentials);
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-        ], 200);
+        return [
+            'success'=>true,
+             'token'=>$token,
+             'data'=>$user
+
+        ];
+    
+
+        
 
     }
 
     public function update(Request $request)
     {
 
-        $validator = Validator::make($request->all(), User::VALIDATION_RULE_UPDATE);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
+        // $validator = Validator::make($request->all(), User::VALIDATION_RULE_UPDATE);
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'data' => $validator->messages(),
+        //     ], 400);
+        // }
         $user = JWTAuth::parseToken()->authenticate();
         $user = User::find($user->id);
         if(!$user){
@@ -99,9 +121,10 @@ class UserControllerAPI extends Controller
                 'data' => 'Token Invalid',
             ], 400);
         }
-        $user->user_email = ($request->user_email) ? $request->user_email : null;
-        $user->password = app('hash')->make($request->password);
-        $user->user_phone = $request->user_phone;
+        $user->full_name = $request->full_name;
+     //   $user->user_email = ($request->user_email) ? $request->user_email : null;
+      //  $user->password = app('hash')->make($request->password);
+     //   $user->user_phone = $request->user_phone;
 
         try {
             DB::beginTransaction();
@@ -113,30 +136,37 @@ class UserControllerAPI extends Controller
                     'lat' => $request->lat,
                     'address_descraption' => (!$request->address_descraption) ? $request->address_descraption : 'null',
                 ]);
+                if($request->images)
+                {
             if (count($request->images) !== 0) {
                 $upload = new UploadImageController;
                 $path = $upload->uploadInner($request);
-                $user->image()->update(
+                $user->image()->create(
                     [
                         'image_url' => $path[0],
                     ]);
             }
+        }
         } catch (\Illuminate\Database\QueryException $e) {
             DB::rollback();
-            return response()->json([
-                'success' => false,
-                'data' => 'data did not updated',
-            ], 400);
+            return false;
+            // return response()->json([
+            //     'success' => false,
+            //     'data' => 'data did not updated',
+            // ], 400);
         }
         DB::commit();
-        return response()->json([
-            'success' => true,
-            'data' => null,
-        ], 200);
+        return [
+            'success'=>true,
+           //  'token'=>$token,
+             'data'=>$user
+
+        ];
     }
 
     public function accountActivate($otpNumber)
     {
+        
         $user = JWTAuth::parseToken()->authenticate();
         if ($user->id) {
             $otpObject = Otp::where(
@@ -174,6 +204,90 @@ class UserControllerAPI extends Controller
             'success' => true,
             'data' => 'user activated',
         ], 200);
+    }
+
+
+
+    public function changePassword(Request $request)
+    {
+
+
+        $validator = Validator::make($request->all(), User::VALIDATION_change_Password);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+
+         $user = JWTAuth::parseToken()->authenticate();
+
+        if($user)
+        {
+            $otpObject = Otp::where('user_id','=',$user->id)
+            ->where('verify_number','=',$request->otpNumber)
+            ->get();
+
+        }
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'data' => 'Account Not Found',
+            ], 401);
+
+        }
+
+
+        // if (count($otpObject)==0) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'data' => 'otp invalid',
+        //     ], 400);
+        // }
+        
+        
+        
+        // else {
+        //     $end_date = strtotime(date("Y-m-d H:i:s"));
+        //     $start_date = strtotime($otpObject[0]->created_at);
+        //     $diffInHoures = floor(($end_date - $start_date) / 60 / 60);
+        //     if ($diffInHoures >= 25) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'data' => 'otp expired',
+        //         ], 401);
+        //     }
+        // }
+        $user = User::find($user->id);
+        $user->password = app('hash')->make($request->password);
+        $user->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'password changed',
+        ], 200);
+    }
+
+    public function logout()
+    {
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json([
+                'success' => true,
+                'data' => 'Successfully logged out',
+            ], 200);
+        
+        }
+
+        catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'data' => 'wrong',
+            ], 400);
+        } 
+
+        
+     
     }
 
     public function check(Request $request)
@@ -228,13 +342,25 @@ class UserControllerAPI extends Controller
 
     public function refresh(Request $request)
     {
-        $token = JWTAuth::getToken();
-        $new_token = JWTAuth::refresh($token);
+        try {
+            $token = JWTAuth::getToken();
+            $new_token = JWTAuth::refresh($token);
+            return response()->json([
+                'success' => true,
+                'data' => $new_token,
+            ], 200);
+        }
 
-        return response()->json([
-            'success' => true,
-            'data' => $new_token,
-        ], 200);
+             catch (Exception $e) {
+           $this->data['data'] = $e->getMessage();
+           return response()->json([
+            'success' => false,
+            'data' => $this->data['data'] = $e->getMessage(),
+        ], 500);
+           
+        } 
+
+       
     }
 
     public function forgotPassword($userPhone)
@@ -263,50 +389,5 @@ class UserControllerAPI extends Controller
         ], 200);
     }
 
-    public function changePassword(Request $request)
-    {
-        if (!$request->validated()) {
-            return response()->json([
-                'success' => false,
-                'data' => $request->messages(),
-            ], 400);
-        }
-        $user = User::where('user_phone', $request->user_phone)->first();
-
-        if ($user) {
-            $otpObject = Otp::where('user_id', '=', $user->id)
-                ->where('verify_number', '=', $request->otpNumber)
-                ->get();
-        } else {
-            return response()->json([
-                'success' => false,
-                'data' => 'Account Not Found',
-            ], 404);
-
-        }
-
-        if (count($otpObject) == 0) {
-            return response()->json([
-                'success' => false,
-                'data' => 'otp invalid',
-            ], 400);
-        } else {
-            $end_date = strtotime(date("Y-m-d H:i:s"));
-            $start_date = strtotime($otpObject[0]->created_at);
-            $diffInHoures = floor(($end_date - $start_date) / 60 / 60);
-            if ($diffInHoures >= 25) {
-                return response()->json([
-                    'success' => false,
-                    'data' => 'otp expired',
-                ], 400);
-            }
-        }
-        $user = User::find($user->id);
-        $user->password = app('hash')->make($request->password);
-        $user->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'password changed',
-        ], 200);
-    }
+  
 }

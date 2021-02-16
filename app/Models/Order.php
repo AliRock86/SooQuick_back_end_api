@@ -4,24 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Database\Eloquent\Builder;
 class Order extends Model
 {
     public const VALIDATION_RULE_STORE = [
-        'merchant_id' => ['required','numeric'],
+        
+        'customer_id' => ['required','numeric'],
+        'delivery_comp_id' => ['required','numeric'],
         'customer_id' => ['required','numeric'],
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
-        'serial_number' => ['required'],
-        'status_id' => ['required','numeric'],
+        // 'serial_number' => ['required'],
+       
     ];
     public const VALIDATION_RULE_UPDATE = [
-        'id' => ['required','numeric'],
-        'merchant_id' => ['required','numeric'],
+        'customer_id' => ['required','numeric'],
+        'delivery_comp_id' => ['required','numeric'],
         'customer_id' => ['required','numeric'],
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
-        'serial_number' => ['required'],
-        'status_id' => ['required','numeric'],
     ];
     protected $guarded = [];
 
@@ -36,13 +38,28 @@ class Order extends Model
 
     public function deliveryComp()
     {
-        return $this->belongsTo('App\Models\deliveryComp');
+        return $this->belongsTo('App\Models\DeliveryCompany','delivery_comp_id');
     }
 
     public function customer()
     {
         return $this->belongsTo('App\Models\Customer');
     }
+
+    public function scopeBetweenDate(Builder $query,$date): Builder
+
+      {
+       
+        $date=explode("_",$date);
+       return $query->whereDate('created_at', [$date[0],$date[1]]);
+    }
+    
+
+    public function DeliveryDriver()
+    {
+        return $this->hasOne('App\Models\DeliveryDrivers');
+    }
+
 
     public function deliveryPrice()
     {

@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\DeliveryDrivers;
+
+use App\Models\DeliveryDrivers;
+use App\Models\Order;
+use App\Http\Requests\OrderRequest;
+use App\Http\Resources\Collections\OrderCollection;
 use App\Http\Resources\DeliveryDriversResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryDriversRequest;
 use App\Http\Resources\Collections\DeliveryDriversCollection;
-
+use Validator;
+use Illuminate\Http\Request;
+use JWTAuth;
 class DeliveryDriversControllerAPI extends Controller
 {
     /**
@@ -31,22 +37,64 @@ class DeliveryDriversControllerAPI extends Controller
      * @param  \App\Http\Requests\DeliveryDriversRequest  $request
      * @return \App\Http\Resources\DeliveryDriversResource
      */
+
+     public function GetByDriverId(Request $request)
+     {
+        
+        $user = JWTAuth::parseToken()->authenticate();
+       $DeliveryDrivers=DeliveryDrivers::where('driver_id','=',$user->driver->id)->with('order')->get()->pluck('order');
+        return new OrderCollection($DeliveryDrivers);
+
+
+     }
     public function store(Request $request)
     {
+
+       
+        $validator = Validator::make($request->all(), DeliveryDrivers::VALIDATION_RULE_STORE);
+        
+       
+
+         if($validator->fails())
+        {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+
+        }
         $user = JWTAuth::parseToken()->authenticate();
-        $deliveryDrivers = new DeliveryCompany;
-        $deliveryDrivers->user_id = $user->id;
-        $deliveryDrivers->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
-        $deliveryDrivers->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
-        $deliveryDrivers->delivery_comp_phone = $request->delivery_comp_phone;
-        $deliveryDrivers->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
-        $deliveryDrivers->status_id = 1;
-        $deliveryDrivers->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
-    }
+        $Order= Order::whereIn('id',$request->order_id)->where('delivery_comp_id','=',$user->DeliveryCompany->id)->get();
+            if(count($Order)>0)
+            {
+            for($i=0;$i<=count($request->order_id);$i++)
+            {
+              
+                $DeliveryDrivers =new DeliveryDrivers();
+                $DeliveryDrivers->driver_id=$request->driver_id;
+                $DeliveryDrivers->order_id=$request->order_id[$i];
+                $DeliveryDrivers->status_id=2;
+                $DeliveryDrivers->save();
+              
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
+
+            }
+            else
+            {
+                return response()->json([
+                    'success' => false,
+                    'data' =>null,
+                ], 400);
+
+
+            }
+      
+}
 
     /**
      * Display the specified resource.

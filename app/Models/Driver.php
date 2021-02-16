@@ -7,23 +7,32 @@ use Illuminate\Database\Eloquent\Model;
 class Driver extends Model
 {
     public const VALIDATION_RULE_STORE = [
-        'user_id' => ['required','numeric'],
+     
         'driver_phone' => ['required','numeric'],
-        'car_number' => ['required'],
+        'car_number' => ['required','numeric'],
         'car_owner_type' => ['required'],
-        'car_owner_name' => ['required','numeric'],
+        'car_owner_name' => ['required'],
         'region_id' => ['required','numeric'],
-        'status_id' => ['required','numeric'],
+       
+        'full_name' => ['required'],
+        'user_phone' => ['required','unique:users'],
+        'region_id' => ['required'],
+        'password' => ['required','min:8','confirmed'],
+        'images' => ['array'],
     ];
     public const VALIDATION_RULE_UPDATE = [
-        'id' => ['required','numeric'],
-        'user_id' => ['required','numeric'],
+        // 'id' => ['required','numeric'],
+        // 'user_id' => ['required','numeric'],
         'driver_phone' => ['required','numeric'],
-        'car_number' => ['required'],
+        'car_number' => ['required','numeric'],
         'car_owner_type' => ['required'],
-        'car_owner_name' => ['required','numeric'],
-        'region_id' => ['required','numeric'],
-        'status_id' => ['required','numeric'],
+        'car_owner_name' => ['required'],
+      
+        'full_name' => ['required'],
+        //'user_phone' => ['required','unique:users'],
+        'region_id' => ['required'],
+        'password' => ['required','min:8','confirmed'],
+        'images' => ['array']
     ];
     protected $guarded = [];
 

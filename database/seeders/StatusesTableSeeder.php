@@ -55,6 +55,12 @@ class StatusesTableSeeder extends Seeder
             'status_color' => '154f','status_icon' => 'dd_ff'],
             ['status_type_id' => 6,'status_name' => 'unactive','status_name_ar' => 'غير فعال',
             'status_color' => '154f','status_icon' => 'dd_ff'],
+            ['status_type_id' => 7,'status_name' => 'active','status_name_ar' => ' فعال',
+            'status_color' => '154f','status_icon' => 'dd_ff'],
+            ['status_type_id' => 7,'status_name' => 'unactive','status_name_ar' => 'غير فعال ',
+            'status_color' => '154f','status_icon' => 'dd_ff'],
+            ['status_type_id' => 8,'status_name' => 'bind','status_name_ar' => 'معلق ',
+            'status_color' => '154f','status_icon' => 'dd_ff'],
         ]);
     }
 }

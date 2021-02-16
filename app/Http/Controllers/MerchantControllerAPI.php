@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Merchant;
+
+use Illuminate\Http\Request;
+use JWTAuth;
 use App\Http\Resources\MerchantResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantRequest;
+use App\Models\DeliveryCompany;
+use App\Models\Merchant;
+use App\Models\User;
+use App\Http\Controllers\UserControllerAPI;
 use App\Http\Resources\Collections\MerchantCollection;
+use Validator;
+
 
 class MerchantControllerAPI extends Controller
 {
@@ -17,8 +25,7 @@ class MerchantControllerAPI extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', Merchant::class);
-
+     
         $merchant = Merchant::all();
 
         return new MerchantCollection($merchant);
@@ -33,18 +40,51 @@ class MerchantControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $merchant= new DeliveryCompany;
-        $merchant->user_id = $user->id;
-        $merchant->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
-        $merchant->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
-        $merchant->delivery_comp_phone = $request->delivery_comp_phone;
-        $merchant->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
-        $merchant->status_id = 1;
+
+     
+
+        $validator = Validator::make($request->all(), Merchant::VALIDATION_RULE_STORE);
+        $request->request->add([ 'role_id' =>1]);
+           
+       
+
+         if($validator->fails())
+        {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+
+        }
+    
+       
+        $user  = app(UserControllerAPI::class)->store($request);
+
+
+            if(!$user)
+        {
+            
+            return response()->json([
+                'success' => false,
+                'data' => null,
+            ], 400);
+
+
+            
+        }
+
+        $merchant= new Merchant;
+        $merchant->user_id = $user['data']->id;
+        $merchant->merchant_barnd_name = $request->merchant_barnd_name;
+        $merchant->merchant_email = ($request->merchant_email) ? $request->merchant_email : 'null';
+        $merchant->merchant_phone = $request->merchant_phone;
+        $merchant->merchant_description =($request->merchant_description) ? $request->merchant_description : 'null';
+       
         $merchant->save();
+
         return response()->json([
             'success' => true,
-            'data' => 'done',
+            'token' => $user['token'],
         ], 200);
 
     }
@@ -57,7 +97,7 @@ class MerchantControllerAPI extends Controller
      */
     public function show(Merchant $merchant)
     {
-        $this->authorize('view', $merchant);
+        //$this->authorize('view', $merchant);
 
         return new MerchantResource($merchant);
 
@@ -70,13 +110,43 @@ class MerchantControllerAPI extends Controller
      * @param  \App\Merchant  $merchant
      * @return \App\Http\Resources\MerchantResource
      */
-    public function update(MerchantRequest $request, Merchant $merchant)
+    public function update(Request $request,$merchant)
     {
-        $this->authorize('update', $merchant);
 
-        $merchant->update($request->validated());
+        
+      
+        $validator = Validator::make($request->all(), Merchant::VALIDATION_RULE_UPDATE);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
 
-        return new MerchantResource($merchant);
+        $user = JWTAuth::parseToken()->authenticate();
+        $user = User::where('user_id','=',$user->id)->first();
+        if(!$user){
+            return response()->json([
+                'success' => false,
+                'data' => 'Token Invalid',
+            ], 400);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $merchant= Merchant::find($merchant);
+        $merchant->user_id = $user->id;
+        $merchant->merchant_barnd_name = $request->merchant_barnd_name;
+        $merchant->merchant_email = ($request->merchant_email) ? $request->merchant_email : 'null';
+        $merchant->merchant_phone = $request->merchant_phone;
+        $merchant->merchant_description =($request->merchant_description) ? $request->merchant_description : 'null';
+        $merchant->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
+     
 
     }
 

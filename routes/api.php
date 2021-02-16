@@ -9,6 +9,15 @@ use App\Http\Controllers\CountryControllerAPI;
 use App\Http\Controllers\CustomerControllerAPI;
 use App\Http\Controllers\ProvinceControllerAPI;
 use App\Http\Controllers\StatusTypeControllerAPI;
+use App\Http\Controllers\MerchantControllerAPI;
+use App\Http\Controllers\DeliveryCompanyControllerAPI;
+use App\Http\Controllers\DriverControllerAPI;
+use App\Http\Controllers\CompanyDriversControllerAPI;
+use App\Http\Controllers\PartnershipControllerAPI;
+use App\Http\Controllers\DeliveryPriceControllerAPI;
+use App\Http\Controllers\OrderControllerAPI;
+use App\Http\Controllers\DeliveryDriversControllerAPI;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -31,15 +40,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
  */
 Route::name('auth.')->prefix('users')->group(function () {
     Route::get('/index', [UserControllerAPI::class,'index'])->name('index');
-    Route::post('/registre', [UserControllerAPI::class,'store'])->name('registre');
+    //Route::post('/registre', [UserControllerAPI::class,'store'])->name('registre');
     Route::patch('/update', [UserControllerAPI::class,'update'])->name('update');
     Route::post('/login', [UserControllerAPI::class,'check'])->name('login');
+    Route::post('/logout', [UserControllerAPI::class,'logout'])->name('logout');
     Route::get('/activation/{otpNumber}', [UserControllerAPI::class,'accountActivate'])->name('activation');
+    Route::post('changePassword',[UserControllerAPI::class,'changePassword']);
     Route::get('/changeStatusByAdmin/{statusId}/{userId}', [UserControllerAPI::class,'changeStatus'])->name('changeStatus')->middleware(['jwt.auth.admin']);
     Route::get('/changeStatusByDelivery/{statusId}/{userId}', [UserControllerAPI::class,'changeStatus'])->name('changeStatus')->middleware(['jwt.auth.delivery']);
     Route::get('/refresh', [UserControllerAPI::class,'refresh'])->name('refresh');
     Route::get('/forgotPassword/{userPhone}', [UserControllerAPI::class,'forgotPassword'])->name('forgotPassword');
-    Route::post('/changePassword', [UserControllerAPI::class,'changePassword'])->name('changePassword');
+   
 });
 
 /*
@@ -93,7 +104,8 @@ Route::name('provinces.')->prefix('provinces')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('regions.')->prefix('regions')->group(function () {
-    Route::get('/{provinceId}', [RegionControllerAPI::class,'show'])->name('show');
+  //  Route::get('/{provinceId}', [RegionControllerAPI::class,'show'])->name('show');
+    Route::get('/', [RegionControllerAPI::class,'index'])->name('index');
 });
 
 /*
@@ -137,13 +149,28 @@ Route::name('addresses.')->prefix('addresses')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('merchants.')->prefix('merchants')->group(function () {
-    Route::patch('/create', [MerchantControllerAPI::class,'store'])->name('create')->middleware(['jwt.auth.owner']);
-    Route::patch('/{merchantId}', [MerchantControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
-    Route::get('/', 'MerchantControllerAPI@index')->name('index');
-    Route::post('/', 'MerchantControllerAPI@store')->name('create');
-    Route::get('/{merchant}', 'MerchantControllerAPI@show')->name('show');
-    Route::patch('/{merchant}', 'MerchantControllerAPI@update')->name('update');
-    Route::delete('/{merchant}', 'MerchantControllerAPI@destroy')->name('destroy');
+    Route::patch('/create', [MerchantControllerAPI::class,'store'])->name('create');
+    Route::patch('/update/{merchantId}', [MerchantControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
+    Route::get('/',  [MerchantControllerAPI::class,'index'])->name('index')->middleware(['jwt.auth.admin']);  
+    Route::get('show/{merchant}', [MerchantControllerAPI::class,'show'])->name('show');
+ 
+});
+
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| customer endpoints
+|--------------------------------------------------------------------------
+ */
+Route::name('customer.')->prefix('customer')->group(function () {
+    Route::patch('/create', [CustomerControllerAPI::class,'store'])->name('create');
+    Route::patch('/update/{id}', [CustomerControllerAPI::class,'update'])->name('update');
+    Route::get('/',  [CustomerControllerAPI::class,'index'])->name('index')->middleware(['jwt.auth.admin']);  
+    Route::get('show/{merchant}', [CustomerControllerAPI::class,'show'])->name('show');
+ 
 });
 
 /*
@@ -151,12 +178,22 @@ Route::name('merchants.')->prefix('merchants')->group(function () {
 | DeliveryCompany endpoints 
 |--------------------------------------------------------------------------
  */
-Route::middleware(['jwt.auth.delivery-company'])->name('delivery-companies.')->prefix('delivery-companies')->group(function () {
-    Route::post('/', [DeliveryCompanyControllerAPI::class,'store'])->name('createCompany');
-    Route::patch('/', [DeliveryCompanyControllerAPI::class,'update'])->name('updateCompany');
+Route::name('deliveryCompanies.')->prefix('deliveryCompanies')->group(function () {
+    Route::post('/create', [DeliveryCompanyControllerAPI::class,'store'])->name('createCompany');
+    Route::patch('update', [DeliveryCompanyControllerAPI::class,'update'])->name('updateCompany');
+    Route::get('/show', [DeliveryCompanyControllerAPI::class,'show'])->middleware(['jwt.auth.delivery']);
 
-    Route::get('/', [CompanyDriversControllerAPI::class,'index'])->name('allDrivers');
+    Route::get('/allDrivers', [DeliveryCompanyControllerAPI::class,'GetAllDrivers'])->name('allDrivers');
     Route::post('/', [DriverControllerAPI::class,'store'])->name('createDriver');
+
+     
+    Route::name('Orders.')->prefix('Orders')->group(function () {
+        Route::get('/', [OrderControllerAPI::class,'GetDeliveryCompanyOrders'])->middleware(['jwt.auth.delivery']);
+        Route::post('/changeStatus', [OrderControllerAPI::class,'ChangeStatusByDeliveryComp'])->middleware(['jwt.auth.delivery']);
+    });
+
+    Route::get('/GetMerchants', [DeliveryCompanyControllerAPI::class,'GetMerchants'])->name('allMerchants');
+
     Route::patch('/{driverId}', [DriverControllerAPI::class,'update'])->name('update');
     Route::get('/{driverId}', [DriverControllerAPI::class,'driverChangeStatus'])->name('driverChangeStatus');
     Route::get('/{phoneNumber}', [DriverControllerAPI::class,'search'])->name('driverSearch');
@@ -166,25 +203,90 @@ Route::middleware(['jwt.auth.delivery-company'])->name('delivery-companies.')->p
     Route::get('/{statusId}', [DeliveryDriversControllerAPI::class,'getPackegsByDriver'])->name('getPackegsByDriver');
     Route::get('/{dliveryId}', [DeliveryDriversControllerAPI::class,'destroy'])->name('deleteAssignedPackegs');
 
-    Route::post('/', [DeliveryPriceControllerAPI::class,'store'])->name('addPrice');
-    Route::patch('/', [DeliveryPriceControllerAPI::class,'update'])->name('updatePrice');
-    Route::get('/', [DeliveryPriceControllerAPI::class,'getAllByCompany'])->name('getAllPrices');
-    Route::get('/{priceId}', [DeliveryPriceControllerAPI::class,'destroy'])->name('deletePrice');
 });
+
+/*
+|--------------------------------------------------------------------------
+| CompanyDrivers endpoints
+|--------------------------------------------------------------------------
+ */
+
+ 
+Route::name('CompanyDrivers.')->prefix('CompanyDrivers')->group(function () {
+    Route::post('/create', [CompanyDriversControllerAPI::class,'store'])->name('createCompanyDrivers')->middleware(['jwt.auth.delivery']);
+    Route::get('/SearchByDeliveryCom',[CompanyDriversControllerAPI::class,'SearchByDeliveryCom'] )->middleware(['jwt.auth.delivery']);
+
+    //Driver
+    Route::get('/SearchByDriver',[CompanyDriversControllerAPI::class,'SearchByDriver'] )->middleware(['jwt.auth.driver']);
+    Route::post('/changeStatusByDriver', [CompanyDriversControllerAPI::class,'changeStatusByDriver'])->name('changeStatusByDriver')->middleware(['jwt.auth.driver']);
+
+
+    Route::post('/changeStatus', [CompanyDriversControllerAPI::class,'changeStatus'])->name('changeStatus')->middleware(['jwt.auth.delivery']);
+    Route::patch('/{customerId}', [CompanyDriversControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
+    Route::get('/', [CompanyDriversControllerAPI::class,'index'])->name('index');
+    Route::post('/', [CompanyDriversControllerAPI::class,'store'])->name('create');
+
+});
+
+
 
 /*
 |--------------------------------------------------------------------------
 | Order endpoints
 |--------------------------------------------------------------------------
  */
+
+
 Route::name('orders.')->prefix('orders')->group(function () {
+    Route::post('/create', [OrderControllerAPI::class,'store'])->name('create')->middleware(['jwt.auth.owner']);
     Route::patch('/{customerId}', [OrderControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
+    
+    Route::get('/search', [OrderControllerAPI::class,'SearchByDeliveryCom'])->name('index')->middleware(['jwt.auth.delivery']);
+
     Route::get('/', [OrderControllerAPI::class,'index'])->name('index');
-    Route::post('/', [OrderControllerAPI::class,'store'])->name('create');
+    
     Route::get('/{orderId}', [OrderControllerAPI::class,'show'])->name('show');
     Route::patch('/{orderId}', [OrderControllerAPI::class,'update'])->name('update');
     Route::delete('/{order}', [OrderControllerAPI::class,'destroy'])->name('destroy');
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Partnership endpoints
+|--------------------------------------------------------------------------
+ */
+Route::name('partnerships.')->prefix('partnerships')->group(function () {
+    Route::get('/', 'PartnershipControllerAPI@index')->name('index');
+    Route::get('/SearchByDeliveryCom',[PartnershipControllerAPI::class,'SearchByDeliveryCom'] )->middleware(['jwt.auth.delivery']);
+    Route::post('/create', [PartnershipControllerAPI::class,'store'])->name('create')->middleware(['jwt.auth.owner']);;
+    Route::get('/{partnership}', 'PartnershipControllerAPI@show')->name('show');
+    Route::post('/ChangStatusByDeliveryCom',[PartnershipControllerAPI::class,'ChangStatusByDeliveryCom'])->name('update')->middleware(['jwt.auth.delivery']);
+    Route::delete('/{partnership}', 'PartnershipControllerAPI@destroy')->name('destroy');
+});
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| DeliveryPrice endpoints
+|--------------------------------------------------------------------------
+ */
+Route::name('deliveryPrices.')->prefix('deliveryPrices')->middleware(['jwt.auth.delivery'])->group(function () {
+
+    Route::get('/', [DeliveryPriceControllerAPI::class,'index'])->name('getAllPrices');
+    Route::post('/create', [DeliveryPriceControllerAPI::class,'store'])->name('addPrice');
+    Route::patch('/update/{id}', [DeliveryPriceControllerAPI::class,'update'])->name('updatePrice');
+    Route::get('/{id}',  [DeliveryPriceControllerAPI::class,'show'])->name('show');
+    Route::get('/{priceId}', [DeliveryPriceControllerAPI::class,'destroy'])->name('deletePrice');
+    Route::delete('/{deliveryPrice}', 'DeliveryPriceControllerAPI@destroy')->name('destroy');
+
+
+});
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -225,18 +327,7 @@ Route::name('notifications.')->prefix('notifications')->group(function () {
     Route::delete('/{notification}', 'NotificationControllerAPI@destroy')->name('destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| DeliveryPrice endpoints
-|--------------------------------------------------------------------------
- */
-Route::name('delivery-prices.')->prefix('delivery-prices')->group(function () {
-    Route::get('/', 'DeliveryPriceControllerAPI@index')->name('index');
-    Route::post('/', 'DeliveryPriceControllerAPI@store')->name('create');
-    Route::get('/{deliveryPrice}', 'DeliveryPriceControllerAPI@show')->name('show');
-    Route::patch('/{deliveryPrice}', 'DeliveryPriceControllerAPI@update')->name('update');
-    Route::delete('/{deliveryPrice}', 'DeliveryPriceControllerAPI@destroy')->name('destroy');
-});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -256,13 +347,37 @@ Route::name('bills.')->prefix('bills')->group(function () {
 | Driver endpoints
 |--------------------------------------------------------------------------
  */
+
+
 Route::name('drivers.')->prefix('drivers')->group(function () {
-    Route::get('/', 'DriverControllerAPI@index')->name('index');
-    Route::post('/', 'DriverControllerAPI@store')->name('create');
-    Route::get('/{driver}', 'DriverControllerAPI@show')->name('show');
-    Route::patch('/{driver}', 'DriverControllerAPI@update')->name('update');
-    Route::delete('/{driver}', 'DriverControllerAPI@destroy')->name('destroy');
+   // Route::get('/',  [DriverControllerAPI::class,'index'])->name('index');
+    Route::post('/create',  [DriverControllerAPI::class,'store'])->name('create');
+   Route::get('/{driver}', [DriverControllerAPI::class,'show'])->name('show');
+    Route::patch('update', [DriverControllerAPI::class,'update'])->middleware(['jwt.auth.driver']);
+   // Route::delete('/{driver}', 'DriverControllerAPI@destroy')->name('destroy');
+
+    Route::name('Orders.')->prefix('Orders')->middleware(['jwt.auth.driver'])->group(function () {
+        Route::get('/',  [DeliveryDriversControllerAPI::class,'GetByDriverId']);
+    });
+
+//GetByDriverId
+    //  Route::post('/create',  [DeliveryDriversControllerAPI::class,'store'] )->middleware(['jwt.auth.delivery']);
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| DeliveryDrivers endpoints
+|--------------------------------------------------------------------------
+ */
+Route::name('deliveryDrivers.')->prefix('deliveryDrivers')->group(function () {
+    Route::get('/',  [DeliveryDriversControllerAPI::class,'index'])->name('index');
+    Route::post('/create',  [DeliveryDriversControllerAPI::class,'store'] )->middleware(['jwt.auth.delivery']);
+    Route::get('/{deliveryDrivers}',[DeliveryDriversControllerAPI::class,'show'])->name('show');
+    Route::patch('/{deliveryDrivers}',[DeliveryDriversControllerAPI::class,'update'])->name('update');
+    Route::delete('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@destroy')->name('destroy');
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -303,31 +418,8 @@ Route::name('actions.')->prefix('actions')->group(function () {
     Route::delete('/{action}', 'ActionControllerAPI@destroy')->name('destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Partnership endpoints
-|--------------------------------------------------------------------------
- */
-Route::name('partnerships.')->prefix('partnerships')->group(function () {
-    Route::get('/', 'PartnershipControllerAPI@index')->name('index');
-    Route::post('/', 'PartnershipControllerAPI@store')->name('create');
-    Route::get('/{partnership}', 'PartnershipControllerAPI@show')->name('show');
-    Route::patch('/{partnership}', 'PartnershipControllerAPI@update')->name('update');
-    Route::delete('/{partnership}', 'PartnershipControllerAPI@destroy')->name('destroy');
-});
 
-/*
-|--------------------------------------------------------------------------
-| DeliveryDrivers endpoints
-|--------------------------------------------------------------------------
- */
-Route::name('delivery-drivers.')->prefix('delivery-drivers')->group(function () {
-    Route::get('/', 'DeliveryDriversControllerAPI@index')->name('index');
-    Route::post('/', 'DeliveryDriversControllerAPI@store')->name('create');
-    Route::get('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@show')->name('show');
-    Route::patch('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@update')->name('update');
-    Route::delete('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@destroy')->name('destroy');
-});
+
 
 /*
 |--------------------------------------------------------------------------

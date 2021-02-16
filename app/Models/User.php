@@ -13,19 +13,33 @@ class User extends Authenticatable implements JWTSubject
     use HasFactory, Notifiable;
 
     public const VALIDATION_RULE_STORE = [
+        'full_name' => ['required'],
         'user_phone' => ['required','unique:users'],
         'region_id' => ['required'],
         'password' => ['required','min:8','confirmed'],
-        'long' => ['required'],
-        'lat' => ['required'],
         'images' => ['array'],
     ];
+
+    public const VALIDATION_change_Password = [
+         //     'user_phone' => 'required|min:13|numeric',
+            'password' =>'required|min:8|confirmed',
+        //    'otpNumber' =>'required|min:6|numeric'
+    ];
+
+
+
+
+
+
+
+    
     public const VALIDATION_RULE_LOGIN =[
         'user_phone' => ['required'],
-        'password' => ['required','min:8','confirmed'],
+        'password' => ['required','min:8'],
     ];
     public const VALIDATION_RULE_UPDATE = [
         'user_phone' => ['required','unique:users'],
+        'full_name' => ['required'],
         'password' => ['required','min:8','confirmed'],
         'region_id' => ['required'],
         'long' => ['required'],
@@ -82,7 +96,7 @@ class User extends Authenticatable implements JWTSubject
     }
     public function merchant()
     {
-        return $this->hasMany('App\Models\Merchant');
+        return $this->hasOne('App\Models\Merchant');
     }
     public function notification()
     {
@@ -90,7 +104,7 @@ class User extends Authenticatable implements JWTSubject
     }
     public function driver()
     {
-        return $this->hasMany('App\Models\Driver');
+        return $this->hasOne('App\Models\Driver');
     }
 
     public function transactionSource()
@@ -101,6 +115,12 @@ class User extends Authenticatable implements JWTSubject
     public function transactionDestination()
     {
         return $this->hasMany('App\Models\Driver','destination_id');
+    }
+
+
+    public function DeliveryCompany()
+    {
+        return $this->hasOne('App\Models\DeliveryCompany');
     }
 
     public function wallet()

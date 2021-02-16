@@ -14,6 +14,19 @@ class DeliveryCompanyResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return
+        [
+        'id'=>$this->id,
+        'delivery_comp_barnd_name'=>$this->delivery_comp_barnd_name,
+        'delivery_comp_email'=>$this->delivery_comp_email,
+        'delivery_comp_phone'=>$this->delivery_comp_phone,
+        'delivery_comp_description'=>$this->delivery_comp_description,
+        'delivery_comp_email'=>$this->delivery_comp_email,
+        'status'=>$this->status,
+        'user'=>new UserResource($this->user)
+
+
+        ];
+        
     }
 }

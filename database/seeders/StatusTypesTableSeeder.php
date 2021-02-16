@@ -23,6 +23,10 @@ class StatusTypesTableSeeder extends Seeder
             ['status_type_name' => 'order'],
             ['status_type_name' => 'driver'],
             ['status_type_name' => 'offer'],
+            ['status_type_name' => 'company_drivers'],
+            ['status_type_name' => 'partnerships'],
         ]);
+        
+        
     }
 }

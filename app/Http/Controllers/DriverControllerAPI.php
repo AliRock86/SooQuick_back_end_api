@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Driver;
+use Illuminate\Http\Request;
+use JWTAuth;
+use App\Models\Driver;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DriverRequest;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\Collections\DriverCollection;
-
+use Validator;
 class DriverControllerAPI extends Controller
 {
     /**
@@ -16,13 +19,13 @@ class DriverControllerAPI extends Controller
      *
      * @return App\Http\Resources\Collections\DriverCollection
      */
-    public function index()
+    public function index(Driver $driver)
     {
-        $this->authorize('viewAny', Driver::class);
+       // $this->authorize('viewAny', Driver::class);
 
-        $driver = Driver::all();
+      //  $driver = Driver::all();
 
-        return new DriverCollection($driver);
+      return new DriverResource($driver);
 
     }
 
@@ -34,28 +37,41 @@ class DriverControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), User::VALIDATION_RULE_STORE);
-        $validator1 = Validator::make($request->all(), Driver::VALIDATION_RULE_STORE);
-        if ($validator->fails() && $validator1->messages()) {
+      
+
+        $validator = Validator::make($request->all(), Driver::VALIDATION_RULE_STORE);
+        $request->request->add([ 'role_id' =>3]);
+           
+       
+
+         if($validator->fails())
+        {
             return response()->json([
                 'success' => false,
-                'data' => $validator1->messages() . $validator->messages(),
+                'data' => $validator->messages(),
             ], 400);
+
         }
-        $user = new User;
-        $user->full_name = $request->full_name;
-        $user->user_email = ($request->user_email) ? $request->user_email : 'null';
-        $user->password = app('hash')->make($request->password);
-        $user->user_phone = $request->user_phone;
-        $user->role_id = 1;
-        $user->status_id = 1;
-        $user->mobile_token = md5(rand(1, 10) . microtime());
-        $user->permision_id = 1;
-        $user->save();
-        $sms_content = mt_rand(19999, 999999);
-        $driver->save();
+    
+       
+        $user  = app(UserControllerAPI::class)->store($request);
+
+
+            if(!$user)
+        {
+            
+            return response()->json([
+                'success' => false,
+                'data' => null,
+            ], 400);
+
+
+            
+        }
+
+       
         $driver = new Driver;
-        $driver->user_id = $user->id;
+        $driver->user_id =  $user['data']->id;
         $driver->driver_description = ($request->driver_description) ? $request->driver_description : 'null';
         $driver->car_number = $request->car_number;
         $driver->driver_phone = $request->user_phone;
@@ -67,21 +83,7 @@ class DriverControllerAPI extends Controller
         try {
             DB::beginTransaction();
             $driver->save();
-            $user->address()->create(
-                [
-                    'region_id' => $request->region_id,
-                    'long' => $request->long,
-                    'lat' => $request->lat,
-                    'address_descraption' => (!$request->address_descraption) ? $request->address_descraption : 'aaa',
-                ]);
-            if (count($request->images) !== 0) {
-                $upload = new UploadImageController;
-                $path = $upload->uploadInner($request);
-                $user->image()->create(
-                    [
-                        'image_url' => $path[0],
-                    ]);
-            }
+          
 
            // Otp::create(['user_id' => $user->id, 'verify_number' => $sms_content]);
         } catch (\Illuminate\Database\QueryException $e) {
@@ -107,11 +109,31 @@ class DriverControllerAPI extends Controller
      * @param  \App\Driver  $driver
      * @return \App\Http\Resources\DriverResource
      */
+
+    // public function show(Driver $driver)
+    // {
     public function show(Driver $driver)
     {
-        $this->authorize('view', $driver);
 
-        return new DriverResource($driver);
+        if($driver)
+        {
+            return response()->json([
+                'success' => true,
+                'data' =>new DriverResource($driver),
+            ], 200);
+           
+
+        }
+
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'data' =>'Not_Found',
+            ], 200);
+        }
+   
+        
 
     }
 
@@ -122,13 +144,69 @@ class DriverControllerAPI extends Controller
      * @param  \App\Driver  $driver
      * @return \App\Http\Resources\DriverResource
      */
-    public function update(DriverRequest $request, Driver $driver)
+    public function update(Request $request)
     {
-        $this->authorize('update', $driver);
+    
+        $validator = Validator::make($request->all(), Driver::VALIDATION_RULE_UPDATE);
+        
+       
 
-        $driver->update($request->validated());
+         if($validator->fails())
+        {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
 
-        return new DriverResource($driver);
+        }
+    
+       
+        $user  = app(UserControllerAPI::class)->update($request);
+
+
+            if(!$user)
+        {
+            
+            return response()->json([
+                'success' => false,
+                'data' => null,
+            ], 400);
+
+
+            
+        }
+
+     
+        $driver =Driver::where('user_id','=',$user['data']->id)->first();
+       
+        $driver->driver_description = ($request->driver_description) ? $request->driver_description : 'null';
+        $driver->car_number = $request->car_number;
+        $driver->driver_phone = $request->user_phone;
+        $driver->car_owner_name = $request->car_owner_name;
+        $driver->car_owner_type = $request->car_owner_type;
+        $driver->status_id = 1;
+        $driver->region_id = 1;
+
+        try {
+            DB::beginTransaction();
+            $driver->save();
+          
+
+           // Otp::create(['user_id' => $user->id, 'verify_number' => $sms_content]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'data' => $e,
+            ], 400);
+        }
+        DB::commit();
+      
+        return response()->json([
+            'success' => true,
+            'data'=>null
+           
+        ], 200);
 
     }
 

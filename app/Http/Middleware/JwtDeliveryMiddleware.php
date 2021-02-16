@@ -22,7 +22,7 @@ class JwtDeliveryMiddleware
 
             if (!$user) {
                 throw new Exception('User Not Found');
-            }elseif ($user->role->role_name != 'delivery') {
+            }elseif ($user->role->role_name != 'deliveryCompany') {
                 throw new Exception('Unauthorized Permission');
             }
 

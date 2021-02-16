@@ -24,6 +24,9 @@ class CreatePartnershipsTable extends Migration
             $table->unsignedBigInteger('delivery_comp_id');
             $table->foreign('delivery_comp_id')->references('id')->on('delivery_companies')->onDelete('cascade');
             $table->unsignedBigInteger('merchant_id');
+            $table->unsignedBigInteger('status_id');
+            $table->BigInteger('discount_value');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->foreign('merchant_id')->references('id')->on('merchants')->onDelete('cascade');
             $table->timestamps();
         });
