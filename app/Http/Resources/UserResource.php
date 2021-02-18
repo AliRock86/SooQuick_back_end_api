@@ -22,16 +22,18 @@ class UserResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'sucess' => true,
-            'data' => [
+            // 'sucess' => true,
+            // 'data' => [
+                'id' => $this->id,
                 'token' => $this->token,
-                'user_name' => $this->full_name,
+                'full_name' => $this->full_name,
                 'user_phone' => $this->user_phone,
                 'user_image' => ($this->image) ? $this->image->image_url : null,
                 'user_email' => ($this->user_email) ? $this->user_email:null ,
                 'user_status' => $this->status->status_name,
                 'user_role' => $this->role->role_name,
-            ],
+                'image'=>$this->image
+           // ],
         ];
     }
 }

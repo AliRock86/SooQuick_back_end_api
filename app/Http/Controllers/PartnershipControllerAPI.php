@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\Partnership;
+use App\Models\Partnership;
 use App\Http\Resources\PartnershipResource;
+use App\Http\Resources\Collections\PartnershipCollection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PartnershipRequest;
-use App\Http\Resources\Collections\PartnershipCollection;
+use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Http\Request;
+use JWTAuth;
+use Validator;
+
 
 class PartnershipControllerAPI extends Controller
 {
@@ -40,17 +45,29 @@ class PartnershipControllerAPI extends Controller
                 'data' => $validator->messages(),
             ], 400);
         }
-      
-     
-        $partnership= new Partnership;
-        $partnership->user_id =$user_id;
-        $partnership->delivery_comp_id = $request->delivery_comp_id;
-        $partnership->merchant_id = $request->merchant_id;
-        $partnership->save();
-            return response()->json([
-                'success' => true,
-                'data' => 'done',
-            ], 200);
+        $user = JWTAuth::parseToken()->authenticate();
+
+
+     $Partnerships=Partnership::where('delivery_comp_id','=',$request->delivery_comp_id)->get();
+    if(count($Partnerships)>0)
+
+    {
+        return response()->json([
+            'success' => false,
+            'data' =>'this Partnerships is found',
+        ], 400);
+    }
+ 
+    $partnership= new Partnership;
+    $partnership->delivery_comp_id = $request->delivery_comp_id;
+    $partnership->merchant_id = $user->merchant->id;
+    $partnership->status_id =21;
+    $partnership->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
     }
 
     /**
@@ -74,27 +91,41 @@ class PartnershipControllerAPI extends Controller
      * @param  \App\Partnership  $partnership
      * @return \App\Http\Resources\PartnershipResource
      */
-    public function update(PartnershipRequest $request, Partnership $partnership)
+    public function ChangStatusByDeliveryCom(Request $request)
     {
-        $validator = Validator::make($request->all(), Partnership::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-        
-        
-        $partnership= Partnership::find($request->partnership_id);
-        $partnership->user_id =$user_id;
-        $partnership->delivery_comp_id = $request->delivery_comp_id;
-        $partnership->merchant_id = $request->merchant_id;
-        $partnership->save();
-            return response()->json([
-                'success' => true,
-                'data' => 'done',
-            ], 200);
+        $user = JWTAuth::parseToken()->authenticate();
+        $Partnership=Partnership::where('id','=',$request->id)->where('delivery_comp_id','=',$user->DeliveryCompany->id)->first();
+        $Partnership->status_id=$request->status_id;
+        $Partnership->discount_value=(int)$request->discount_value;
+        $Partnership->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
+    
+       
+
     }
+
+
+
+    public function SearchByDeliveryCom(Request $request)
+    {
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        $items = QueryBuilder::for(Partnership::class)
+        ->where('delivery_comp_id','=',$user->DeliveryCompany->id)
+        ->allowedFilters(['id','status_id','merchant.merchant_phone'])
+        ->paginate(15);
+       return new  PartnershipCollection($items);
+       
+
+    }
+
+
+
 
     /**
      * Remove the specified resource from storage.

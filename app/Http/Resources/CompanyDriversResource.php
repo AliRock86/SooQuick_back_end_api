@@ -14,6 +14,12 @@ class CompanyDriversResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+         return
+      [
+        'id'=>$this->id,
+        'driver'=>['id'=>$this->driver->id,'name'=>$this->driver->user->full_name,'driver_phone'=>$this->driver->driver_phone,'car_number'=>$this->driver->car_number,'image'=>$this->driver->user->image,'car_owner_name'=>$this->driver->car_owner_name,'region'=>new RegionResource($this->driver->region)],
+        'status'=>['id'=>$this->status->id,'status_name'=>$this->status->status_name,'status_name_ar'=>$this->status->status_name_ar,'status_color'=>$this->status->status_color],
+       
+      ];
     }
 }

@@ -8,9 +8,9 @@ class DeliveryDrivers extends Model
 {
 
     public const VALIDATION_RULE_STORE = [
-        'id' => ['required','numeric'],
+  //      'id' => ['required','numeric'],
         'driver_id' => ['required','numeric'],
-        'order_id' => ['required','numeric'],
+        'order_id' => ['required','array'],
         'status_id' => ['required','numeric'],
     ];
 

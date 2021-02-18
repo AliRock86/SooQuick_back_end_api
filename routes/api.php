@@ -177,15 +177,8 @@ Route::middleware(['jwt.auth.delivery-company'])->name('delivery-companies.')->p
 | Order endpoints
 |--------------------------------------------------------------------------
  */
-Route::name('orders.')->prefix('orders')->group(function () {
-    Route::patch('/{customerId}', [OrderControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
-    Route::get('/', [OrderControllerAPI::class,'index'])->name('index');
-    Route::post('/', [OrderControllerAPI::class,'store'])->name('create');
-    Route::get('/{orderId}', [OrderControllerAPI::class,'show'])->name('show');
-    Route::patch('/{orderId}', [OrderControllerAPI::class,'update'])->name('update');
-    Route::delete('/{order}', [OrderControllerAPI::class,'destroy'])->name('destroy');
-});
 
+ 
 /*
 |--------------------------------------------------------------------------
 | Image endpoints

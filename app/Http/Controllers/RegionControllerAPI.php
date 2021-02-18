@@ -17,8 +17,7 @@ class RegionControllerAPI extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', Region::class);
-
+   
         $region = Region::all();
 
         return new RegionCollection($region);

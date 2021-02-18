@@ -24,6 +24,8 @@ class CreateCompanyDriversTable extends Migration
             $table->unsignedBigInteger('delivery_comp_id');
             $table->foreign('delivery_comp_id')->references('id')->on('delivery_companies')->onDelete('cascade');
             $table->unsignedBigInteger('driver_id');
+            $table->unsignedBigInteger('status_id');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
             $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('cascade');
             $table->timestamps();
         });

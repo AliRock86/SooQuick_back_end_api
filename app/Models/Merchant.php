@@ -7,14 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Merchant extends Model
 {
     public const VALIDATION_RULE_STORE = [
-        'user_id' => ['required','numeric'],
+       
         'merchant_barnd_name' => ['required'],
         'merchant_phone' => ['required','numeric','unique:merchants'],
         'facebook_url' => [],
+        'full_name' => ['required'],
+        'user_phone' => ['required','unique:users'],
+        'region_id' => ['required'],
+        'password' => ['required','min:8','confirmed'],
+        'images' => ['array'],
     ];
     public const VALIDATION_RULE_UPDATE = [
-        'id' => ['required','numeric'],
-        'user_id' => ['required','numeric'],
+   //    'user_id' => ['required','numeric'],
         'merchant_barnd_name' => ['required'],
         'merchant_phone' => ['required','numeric','unique:merchants'],
         'facebook_url' => [],
@@ -33,6 +37,11 @@ class Merchant extends Model
     public function offer()
     {
         return $this->hasMany('App\Models\Offer');
+    }
+
+    public function region()
+    {
+        return $this->belongsTo('App\Models\Region');
     }
 
     public function order()

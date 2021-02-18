@@ -7,19 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 class DeliveryCompany extends Model
 {
     public const VALIDATION_RULE_STORE = [
-        'user_id' => ['required','numeric'],
+     
         'delivery_comp_barnd_name' => ['required'],
         'delivery_comp_phone' => ['required','numeric'],
         'delivery_comp_barnd_name' => ['required'],
+        'full_name' => ['required'],
+        'user_phone' => ['required','unique:users'],
+        'region_id' => ['required'],
+        'password' => ['required','min:8','confirmed'],
+        'images' => ['array'],
     ];
 
     public const VALIDATION_RULE_UPDATE = [
-        'id' => ['required','numeric'],
-        'company_id' => ['required','numeric'],
+      
+      
         'delivery_comp_barnd_name' => ['required'],
-        'delivery_comp_phone' => ['required','numeric'],
+        'delivery_comp_phone' => ['numeric'],
         'delivery_comp_barnd_name' => ['required'],
-        'status_id' => ['required','numeric'],
+      
+        'full_name' => ['required'],
+       // 'user_phone' => ['required','unique:users'],
+        'region_id' => ['required'],
+     
+        'images' => ['array'],
     ];
     protected $guarded = [];
 
@@ -44,8 +54,27 @@ class DeliveryCompany extends Model
 
     public function partnership()
     {
-        return $this->hasMany('App\models\Partnership');
+        return $this->hasOne('App\models\Partnership','delivery_comp_id');
     }
+    public function DeliveryPrice()
+    {
+        return $this->hasMany('App\models\DeliveryPrice','delivery_comp_id');
+        
+    }
+
+
+    public function drivers()
+    {
+        return $this->hasMany('App\models\CompanyDrivers','delivery_comp_id');
+        
+    }
+
+
+    public function region()
+    {
+        return $this->belongsTo('App\Models\Region');
+    }
+    
 
     public function transferredOrders_from()
     {

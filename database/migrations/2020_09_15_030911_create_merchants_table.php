@@ -26,6 +26,8 @@ class CreateMerchantsTable extends Migration
             $table->string('merchant_barnd_name');
             $table->string('merchant_email',191)->nullable()->default(null);
             $table->bigInteger('merchant_phone');
+            $table->unsignedBigInteger('region_id');
+            $table->foreign('region_id')->references('id')->on('regions')->onDelete('cascade');
             $table->unique('merchant_phone');
             $table->longText('merchant_description')->nullable()->default(null);
             $table->text('facebook_url')->nullable()->default(null);
