@@ -76,15 +76,27 @@ class BillControllerAPI extends Controller
      * @param  \App\Bill  $bill
      * @return \App\Http\Resources\BillResource
      */
-    public function update(BillRequest $request, Bill $bill)
+    public function update(BillRequest $request, Bill $bill)                   
+
     {
-        $this->authorize('update', $bill);
+            $validator = Validator::make($request->all(), Bill::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+                            
+              $bill= Bill::find($request->bill_id);
+              $bill->name =$name;
+              $bill->save();
 
-        $bill->update($request->validated());
-
-        return new BillResource($bill);
-
-    }
+                return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                        ], 200);
+        }
 
     /**
      * Remove the specified resource from storage.

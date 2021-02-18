@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Merchant;
+use App\Model\Merchant;
 use App\Http\Resources\MerchantResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantRequest;
@@ -32,21 +32,29 @@ class MerchantControllerAPI extends Controller
      * @return \App\Http\Resources\MerchantResource
      */
     public function store(Request $request)
-    {
-        $user = JWTAuth::parseToken()->authenticate();
-        $merchant= new DeliveryCompany;
-        $merchant->user_id = $user->id;
-        $merchant->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
-        $merchant->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
-        $merchant->delivery_comp_phone = $request->delivery_comp_phone;
-        $merchant->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
-        $merchant->status_id = 1;
-        $merchant->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
-
+        {
+            $validator = Validator::make($request->all(), Merchant::VALIDATION_RULE_STORE);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'success' => false,
+                        'data' => $validator->messages(),
+                    ], 400);
+                }
+                
+                    
+                $merchant = new Merchant;
+                $merchant->user_id = $user_id;
+                $merchant->merchant_barnd_name = $request->merchant_barnd_name;
+                $merchant->merchant_email =$request->merchant_email;
+                $merchant->merchant_phone =$request->merchant_phone;
+                $merchant->merchant_description =$request->merchant_description;
+                $merchant->facebook_url =$request->facebook_url;
+                $merchant->offer =$request->offer;
+                $merchant->save();
+                        return response()->json([
+                            'success' => true,
+                            'data' => 'done',
+                        ], 200);
     }
 
     /**
@@ -72,11 +80,29 @@ class MerchantControllerAPI extends Controller
      */
     public function update(MerchantRequest $request, Merchant $merchant)
     {
-        $this->authorize('update', $merchant);
-
-        $merchant->update($request->validated());
-
-        return new MerchantResource($merchant);
+      
+        $validator = Validator::make($request->all(), Merchant::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+            
+                
+              $merchant = Merchant::find($request->merchant_id);
+              $merchant->user_id = $user_id;
+              $merchant->merchant_barnd_name = $request->merchant_barnd_name;
+              $merchant->merchant_email =$request->merchant_email;
+              $merchant->merchant_phone =$request->merchant_phone;
+              $merchant->merchant_description =$request->merchant_description;
+              $merchant->facebook_url =$request->facebook_url;
+              $merchant->offer =$request->offer;
+              $merchant->save();
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
 
     }
 

@@ -42,7 +42,7 @@ class UserControllerAPI extends Controller
         $user->status_id = 1;
         $user->mobile_token = md5(rand(1, 10) . microtime());
         $user->permision_id = 1;
-        $sms_content = mt_rand(19999, 999999);
+        $sms_content = mt_rand(199999, 999999);
 
         try {
             DB::beginTransaction();
@@ -52,7 +52,7 @@ class UserControllerAPI extends Controller
                     'region_id' => $request->region_id,
                     'long' => $request->long,
                     'lat' => $request->lat,
-                    'address_descraption' => (!$request->address_descraption) ? $request->address_descraption : 'aaa',
+                    'address_descraption' => (!$request->address_descraption) ? $request->address_descraption : 'null',
                 ]);
             if (count($request->images) !== 0) {
                 $upload = new UploadImageController;

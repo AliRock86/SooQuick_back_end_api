@@ -11,7 +11,7 @@ class Order extends Model
         'customer_id' => ['required','numeric'],
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
-        'serial_number' => ['required'],
+        'serial_number' => [''],
         'status_id' => ['required','numeric'],
     ];
     public const VALIDATION_RULE_UPDATE = [
@@ -20,7 +20,7 @@ class Order extends Model
         'customer_id' => ['required','numeric'],
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
-        'serial_number' => ['required'],
+        'serial_number' => [''],
         'status_id' => ['required','numeric'],
     ];
     protected $guarded = [];

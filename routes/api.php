@@ -102,11 +102,11 @@ Route::name('regions.')->prefix('regions')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('permisions.')->prefix('permisions')->group(function () {
-    Route::get('/', 'PermisionControllerAPI@index')->name('index');
-    Route::post('/', 'PermisionControllerAPI@store')->name('create');
-    Route::get('/{permision}', 'PermisionControllerAPI@show')->name('show');
-    Route::patch('/{permision}', 'PermisionControllerAPI@update')->name('update');
-    Route::delete('/{permision}', 'PermisionControllerAPI@destroy')->name('destroy');
+    Route::get('/', [PermisionControllerAPI::class],'index')->name('index');
+    Route::post('/', [PermisionControllerAPI::class],'store')->name('create');
+    Route::get('/{permision}', [PermisionControllerAPI::class],'show')->name('show');
+    Route::patch('/{permision}', [PermisionControllerAPI::class],'update')->name('update');
+    Route::delete('/{permision}', [PermisionControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -124,11 +124,11 @@ Route::name('customers.')->prefix('customers')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('addresses.')->prefix('addresses')->group(function () {
-    Route::get('/', 'AddressControllerAPI@index')->name('index');
-    Route::post('/', 'AddressControllerAPI@store')->name('create');
-    Route::get('/{address}', 'AddressControllerAPI@show')->name('show');
-    Route::patch('/{address}', 'AddressControllerAPI@update')->name('update');
-    Route::delete('/{address}', 'AddressControllerAPI@destroy')->name('destroy');
+    Route::get('/', [AddressControllerAPI::class],'index')->name('index');
+    Route::post('/', [AddressControllerAPI::class],'store')->name('create');
+    Route::get('/{address}', [AddressControllerAPI::class],'show')->name('show');
+    Route::patch('/{address}', [AddressControllerAPI::class],'update')->name('update');
+    Route::delete('/{address}', [AddressControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -139,11 +139,11 @@ Route::name('addresses.')->prefix('addresses')->group(function () {
 Route::name('merchants.')->prefix('merchants')->group(function () {
     Route::patch('/create', [MerchantControllerAPI::class,'store'])->name('create')->middleware(['jwt.auth.owner']);
     Route::patch('/{merchantId}', [MerchantControllerAPI::class,'update'])->name('update')->middleware(['jwt.auth.owner']);
-    Route::get('/', 'MerchantControllerAPI@index')->name('index');
-    Route::post('/', 'MerchantControllerAPI@store')->name('create');
-    Route::get('/{merchant}', 'MerchantControllerAPI@show')->name('show');
-    Route::patch('/{merchant}', 'MerchantControllerAPI@update')->name('update');
-    Route::delete('/{merchant}', 'MerchantControllerAPI@destroy')->name('destroy');
+    Route::get('/', [MerchantControllerAPI::class],'index')->name('index');
+    Route::post('/', [MerchantControllerAPI::class],'store')->name('create');
+    Route::get('/{merchant}', [MerchantControllerAPI::class],'show')->name('show');
+    Route::patch('/{merchant}', [MerchantControllerAPI::class],'update')->name('update');
+    Route::delete('/{merchant}', [MerchantControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -192,11 +192,11 @@ Route::name('orders.')->prefix('orders')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('images.')->prefix('images')->group(function () {
-    Route::get('/', 'ImageControllerAPI@index')->name('index');
-    Route::post('/', 'ImageControllerAPI@store')->name('create');
-    Route::get('/{image}', 'ImageControllerAPI@show')->name('show');
-    Route::patch('/{image}', 'ImageControllerAPI@update')->name('update');
-    Route::delete('/{image}', 'ImageControllerAPI@destroy')->name('destroy');
+    Route::get('/', [ImageControllerAPI::class],'index')->name('index');
+    Route::post('/', [ImageControllerAPI::class],'store')->name('create');
+    Route::get('/{image}', [ImageControllerAPI::class],'show')->name('show');
+    Route::patch('/{image}', [ImageControllerAPI::class],'update')->name('update');
+    Route::delete('/{image}', [ImageControllerAPId::class],'destroy')->name('destroy');
 });
 
 /*
@@ -205,11 +205,11 @@ Route::name('images.')->prefix('images')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('notification-types.')->prefix('notification-types')->group(function () {
-    Route::get('/', 'NotificationTypeControllerAPI@index')->name('index');
-    Route::post('/', 'NotificationTypeControllerAPI@store')->name('create');
-    Route::get('/{notificationType}', 'NotificationTypeControllerAPI@show')->name('show');
-    Route::patch('/{notificationType}', 'NotificationTypeControllerAPI@update')->name('update');
-    Route::delete('/{notificationType}', 'NotificationTypeControllerAPI@destroy')->name('destroy');
+    Route::get('/', [NotificationTypeControllerAPI::class],'index')->name('index');
+    Route::post('/', [NotificationTypeControllerAPI::class],'store')->name('create');
+    Route::get('/{notificationType}', [NotificationTypeControllerAPI::class],'show')->name('show');
+    Route::patch('/{notificationType}', [NotificationTypeControllerAPI::class],'update')->name('update');
+    Route::delete('/{notificationType}', [NotificationTypeControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -218,11 +218,11 @@ Route::name('notification-types.')->prefix('notification-types')->group(function
 |--------------------------------------------------------------------------
  */
 Route::name('notifications.')->prefix('notifications')->group(function () {
-    Route::get('/', 'NotificationControllerAPI@index')->name('index');
-    Route::post('/', 'NotificationControllerAPI@store')->name('create');
-    Route::get('/{notification}', 'NotificationControllerAPI@show')->name('show');
-    Route::patch('/{notification}', 'NotificationControllerAPI@update')->name('update');
-    Route::delete('/{notification}', 'NotificationControllerAPI@destroy')->name('destroy');
+    Route::get('/', [NotificationControllerAPI::class],'index')->name('index');
+    Route::post('/', [NotificationControllerAPI::class],'store')->name('create');
+    Route::get('/{notification}', [NotificationControllerAPI::class],'show')->name('show');
+    Route::patch('/{notification}', [NotificationControllerAPI::class],'update')->name('update');
+    Route::delete('/{notification}', [NotificationControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -231,11 +231,11 @@ Route::name('notifications.')->prefix('notifications')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('delivery-prices.')->prefix('delivery-prices')->group(function () {
-    Route::get('/', 'DeliveryPriceControllerAPI@index')->name('index');
-    Route::post('/', 'DeliveryPriceControllerAPI@store')->name('create');
-    Route::get('/{deliveryPrice}', 'DeliveryPriceControllerAPI@show')->name('show');
-    Route::patch('/{deliveryPrice}', 'DeliveryPriceControllerAPI@update')->name('update');
-    Route::delete('/{deliveryPrice}', 'DeliveryPriceControllerAPI@destroy')->name('destroy');
+    Route::get('/', [DeliveryPriceControllerAPI::class],'index')->name('index');
+    Route::post('/', [DeliveryPriceControllerAPI::class],'store')->name('create');
+    Route::get('/{deliveryPrice}', [DeliveryPriceControllerAPI::class],'show')->name('show');
+    Route::patch('/{deliveryPrice}', [DeliveryPriceControllerAPI::class],'update')->name('update');
+    Route::delete('/{deliveryPrice}', [DeliveryPriceControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -244,11 +244,11 @@ Route::name('delivery-prices.')->prefix('delivery-prices')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('bills.')->prefix('bills')->group(function () {
-    Route::get('/', 'BillControllerAPI@index')->name('index');
-    Route::post('/', 'BillControllerAPI@store')->name('create');
-    Route::get('/{bill}', 'BillControllerAPI@show')->name('show');
-    Route::patch('/{bill}', 'BillControllerAPI@update')->name('update');
-    Route::delete('/{bill}', 'BillControllerAPI@destroy')->name('destroy');
+    Route::get('/', [BillControllerAPI::class],'index')->name('index');
+    Route::post('/', [BillControllerAPI::class],'store')->name('create');
+    Route::get('/{bill}', [BillControllerAPI::class],'show')->name('show');
+    Route::patch('/{bill}', [BillControllerAPI::class],'update')->name('update');
+    Route::delete('/{bill}', [BillControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -257,11 +257,11 @@ Route::name('bills.')->prefix('bills')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('drivers.')->prefix('drivers')->group(function () {
-    Route::get('/', 'DriverControllerAPI@index')->name('index');
-    Route::post('/', 'DriverControllerAPI@store')->name('create');
-    Route::get('/{driver}', 'DriverControllerAPI@show')->name('show');
-    Route::patch('/{driver}', 'DriverControllerAPI@update')->name('update');
-    Route::delete('/{driver}', 'DriverControllerAPI@destroy')->name('destroy');
+    Route::get('/', [DriverControllerAPI::class],'index')->name('index');
+    Route::post('/', [ DriverControllerAPI::class],'store')->name('create');
+    Route::get('/{driver}', [DriverControllerAPI::class],'show')->name('show');
+    Route::patch('/{driver}', [DriverControllerAPI::class],'update')->name('update');
+    Route::delete('/{driver}', [DriverControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -270,11 +270,11 @@ Route::name('drivers.')->prefix('drivers')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('otps.')->prefix('otps')->group(function () {
-    Route::get('/', 'OtpControllerAPI@index')->name('index');
-    Route::post('/', 'OtpControllerAPI@store')->name('create');
-    Route::get('/{otp}', 'OtpControllerAPI@show')->name('show');
-    Route::patch('/{otp}', 'OtpControllerAPI@update')->name('update');
-    Route::delete('/{otp}', 'OtpControllerAPI@destroy')->name('destroy');
+    Route::get('/', [OtpControllerAPI::class],'index')->name('index');
+    Route::post('/', [OtpControllerAPI::class],'store')->name('create');
+    Route::get('/{otp}', [OtpControllerAPI::class],'show')->name('show');
+    Route::patch('/{otp}', [OtpControllerAPI::class],'update')->name('update');
+    Route::delete('/{otp}', [OtpControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -283,11 +283,11 @@ Route::name('otps.')->prefix('otps')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('offers.')->prefix('offers')->group(function () {
-    Route::get('/', 'OfferControllerAPI@index')->name('index');
-    Route::post('/', 'OfferControllerAPI@store')->name('create');
-    Route::get('/{offer}', 'OfferControllerAPI@show')->name('show');
-    Route::patch('/{offer}', 'OfferControllerAPI@update')->name('update');
-    Route::delete('/{offer}', 'OfferControllerAPI@destroy')->name('destroy');
+    Route::get('/', [OfferControllerAPI::class],'index')->name('index');
+    Route::post('/', [OfferControllerAPI::class],'store')->name('create');
+    Route::get('/{offer}', [OfferControllerAPI::class],'show')->name('show');
+    Route::patch('/{offer}', [OfferControllerAPI::class],'update')->name('update');
+    Route::delete('/{offer}', [OfferControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -296,11 +296,11 @@ Route::name('offers.')->prefix('offers')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('actions.')->prefix('actions')->group(function () {
-    Route::get('/', 'ActionControllerAPI@index')->name('index');
-    Route::post('/', 'ActionControllerAPI@store')->name('create');
-    Route::get('/{action}', 'ActionControllerAPI@show')->name('show');
-    Route::patch('/{action}', 'ActionControllerAPI@update')->name('update');
-    Route::delete('/{action}', 'ActionControllerAPI@destroy')->name('destroy');
+    Route::get('/', [ActionControllerAPI::class],'index')->name('index');
+    Route::post('/', [ActionControllerAPI::class],'store')->name('create');
+    Route::get('/{action}', [ActionControllerAPI::class],'show')->name('show');
+    Route::patch('/{action}', [ActionControllerAPI::class],'update')->name('update');
+    Route::delete('/{action}', [ActionControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -309,11 +309,11 @@ Route::name('actions.')->prefix('actions')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('partnerships.')->prefix('partnerships')->group(function () {
-    Route::get('/', 'PartnershipControllerAPI@index')->name('index');
-    Route::post('/', 'PartnershipControllerAPI@store')->name('create');
-    Route::get('/{partnership}', 'PartnershipControllerAPI@show')->name('show');
-    Route::patch('/{partnership}', 'PartnershipControllerAPI@update')->name('update');
-    Route::delete('/{partnership}', 'PartnershipControllerAPI@destroy')->name('destroy');
+    Route::get('/', [PartnershipControllerAPI::class],'index')->name('index');
+    Route::post('/', [PartnershipControllerAPI::class],'store')->name('create');
+    Route::get('/{partnership}', [PartnershipControllerAPI::class],'show')->name('show');
+    Route::patch('/{partnership}', [PartnershipControllerAPI::class],'update')->name('update');
+    Route::delete('/{partnership}', [PartnershipControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -322,11 +322,11 @@ Route::name('partnerships.')->prefix('partnerships')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('delivery-drivers.')->prefix('delivery-drivers')->group(function () {
-    Route::get('/', 'DeliveryDriversControllerAPI@index')->name('index');
-    Route::post('/', 'DeliveryDriversControllerAPI@store')->name('create');
-    Route::get('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@show')->name('show');
-    Route::patch('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@update')->name('update');
-    Route::delete('/{deliveryDrivers}', 'DeliveryDriversControllerAPI@destroy')->name('destroy');
+    Route::get('/', [DeliveryDriversControllerAPI::class],'index')->name('index');
+    Route::post('/', [DeliveryDriversControllerAPI::class],'store')->name('create');
+    Route::get('/{deliveryDrivers}', [DeliveryDriversControllerAPI::class],'show')->name('show');
+    Route::patch('/{deliveryDrivers}', [DeliveryDriversControllerAPI::class],'update')->name('update');
+    Route::delete('/{deliveryDrivers}', [DeliveryDriversControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -335,11 +335,11 @@ Route::name('delivery-drivers.')->prefix('delivery-drivers')->group(function () 
 |--------------------------------------------------------------------------
  */
 Route::name('instructions.')->prefix('instructions')->group(function () {
-    Route::get('/', 'InstructionControllerAPI@index')->name('index');
-    Route::post('/', 'InstructionControllerAPI@store')->name('create');
-    Route::get('/{instruction}', 'InstructionControllerAPI@show')->name('show');
-    Route::patch('/{instruction}', 'InstructionControllerAPI@update')->name('update');
-    Route::delete('/{instruction}', 'InstructionControllerAPI@destroy')->name('destroy');
+    Route::get('/', [InstructionControllerAPI::class],'index')->name('index');
+    Route::post('/', [InstructionControllerAPI::class],'store')->name('create');
+    Route::get('/{instruction}', [InstructionControllerAPI::class],'show')->name('show');
+    Route::patch('/{instruction}', [InstructionControllerAPI::class],'update')->name('update');
+    Route::delete('/{instruction}', [InstructionControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -348,11 +348,11 @@ Route::name('instructions.')->prefix('instructions')->group(function () {
 |--------------------------------------------------------------------------
  */
 Route::name('order-instructions.')->prefix('order-instructions')->group(function () {
-    Route::get('/', 'OrderInstructionControllerAPI@index')->name('index');
-    Route::post('/', 'OrderInstructionControllerAPI@store')->name('create');
-    Route::get('/{orderInstruction}', 'OrderInstructionControllerAPI@show')->name('show');
-    Route::patch('/{orderInstruction}', 'OrderInstructionControllerAPI@update')->name('update');
-    Route::delete('/{orderInstruction}', 'OrderInstructionControllerAPI@destroy')->name('destroy');
+    Route::get('/', [OrderInstructionControllerAPI::class],'index')->name('index');
+    Route::post('/', [OrderInstructionControllerAPI::class],'store')->name('create');
+    Route::get('/{orderInstruction}', [OrderInstructionControllerAPI::class],'show')->name('show');
+    Route::patch('/{orderInstruction}', [OrderInstructionControllerAPI::class],'update')->name('update');
+    Route::delete('/{orderInstruction}', [OrderInstructionControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*
@@ -361,11 +361,11 @@ Route::name('order-instructions.')->prefix('order-instructions')->group(function
 |--------------------------------------------------------------------------
  */
 Route::name('order-acations.')->prefix('order-acations')->group(function () {
-    Route::get('/', 'OrderAcationControllerAPI@index')->name('index');
-    Route::post('/', 'OrderAcationControllerAPI@store')->name('create');
-    Route::get('/{orderAcation}', 'OrderAcationControllerAPI@show')->name('show');
-    Route::patch('/{orderAcation}', 'OrderAcationControllerAPI@update')->name('update');
-    Route::delete('/{orderAcation}', 'OrderAcationControllerAPI@destroy')->name('destroy');
+    Route::get('/', [OrderAcationControllerAPI::class],'index')->name('index');
+    Route::post('/', [OrderAcationControllerAPI::class],'store')->name('create');
+    Route::get('/{orderAcation}', [OrderAcationControllerAPI::class],'show')->name('show');
+    Route::patch('/{orderAcation}', [OrderAcationControllerAPI::class],'update')->name('update');
+    Route::delete('/{orderAcation}', [OrderAcationControllerAPI::class],'destroy')->name('destroy');
 });
 
 /*

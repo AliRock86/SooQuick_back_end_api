@@ -42,14 +42,14 @@ class PermisionControllerAPI extends Controller
         }
       
      
-  $permision= new Permision;
-  $permision->user_id =$user_id;
-  $permision->permision_name = $request->permision_name;
-  $permision->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+        $permision= new Permision;
+        $permision->user_id =$user_id;
+        $permision->permision_name = $request->permision_name;
+        $permision->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
     }
     
 
@@ -76,11 +76,23 @@ class PermisionControllerAPI extends Controller
      */
     public function update(PermisionRequest $request, Permision $permision)
     {
-        $this->authorize('update', $permision);
-
-        $permision->update($request->validated());
-
-        return new PermisionResource($permision);
+            $validator = Validator::make($request->all(), Permision::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+                $permision= Permision::find($request->permision_id);
+                $permision->user_id =$user_id;
+                $permision->permision_name = $request->permision_name;
+                $permision->save();
+                        return response()->json([
+                            'success' => true,
+                            'data' => 'done',
+                        ], 200);
 
     }
 

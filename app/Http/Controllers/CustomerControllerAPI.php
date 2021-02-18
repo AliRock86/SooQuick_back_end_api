@@ -75,21 +75,24 @@ class CustomerControllerAPI extends Controller
      * @param  \App\Customer  $customer
      * @return \App\Http\Resources\CustomerResource
      */
-    public function update(Request $request)
+    public function update(CustomerRequest $request, Customer $customer )
     {
-        //$this->authorize('update', $customer);
-        $validator = Validator::make($request->all(), Customer::VALIDATION_RULE_UPDATE);
+        $validator = Validator::make($request->all(), Customer::VALIDATION_RULE_STORE);
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'data' => $validator->messages(),
             ], 400);
         }
-         Customer::find($request->id)->update($request->all());
 
+        $customer =  Customer::find($request->customer_id);
+        $customer->customer_name = $request->customer_name;
+        $customer->customer_phone_1 = $request->customer_phone_1;
+        $customer->customer_phone_2 = $request->customer_phone_2;
+        $customer->save();
         return response()->json([
             'success' => true,
-            'data' => null,
+            'data' => 'done',
         ], 200);
 
     }

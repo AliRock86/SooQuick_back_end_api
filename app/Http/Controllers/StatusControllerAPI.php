@@ -41,19 +41,19 @@ class StatusControllerAPI extends Controller
             ], 400);
         }
       
-     
-     $status= new Status;
-     $status->user_id =$user_id;
-     $status->status_type_id = $request->status_type_id;
-     $status->status_name = $request->status_name;
-     $status->status_name_ar = $request->status_name_ar;
-     $status->status_color = $request->status_color;
-     $status->status_icon = $request->status_icon;
-     $status->save();
-         return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+            
+            $status= new Status;
+            $status->user_id =$user_id;
+            $status->status_type_id = $request->status_type_id;
+            $status->status_name = $request->status_name;
+            $status->status_name_ar = $request->status_name_ar;
+            $status->status_color = $request->status_color;
+            $status->status_icon = $request->status_icon;
+            $status->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
     }
 
     /**
@@ -79,12 +79,28 @@ class StatusControllerAPI extends Controller
      */
     public function update(StatusRequest $request, Status $status)
     {
-        $this->authorize('update', $status);
-
-        $status->update($request->validated());
-
-        return new StatusResource($status);
-
+      
+        $validator = Validator::make($request->all(), Status::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+            
+            $status= Status::find($request->status_id);
+            $status->user_id =$user_id;
+            $status->status_type_id = $request->status_type_id;
+            $status->status_name = $request->status_name;
+            $status->status_name_ar = $request->status_name_ar;
+            $status->status_color = $request->status_color;
+            $status->status_icon = $request->status_icon;
+            $status->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
     }
 
     /**
@@ -100,6 +116,17 @@ class StatusControllerAPI extends Controller
         $status->delete();
 
         return new StatusResource($status);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = Status::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\DeliveryPrice;
+use App\Model\DeliveryPrice;
 use App\Http\Resources\DeliveryPriceResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryPriceRequest;
@@ -33,19 +33,27 @@ class DeliveryPriceControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $deliveryPrice = new DeliveryCompany;
-        $deliveryPrice->user_id = $user->id;
-        $deliveryPrice->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
-        $deliveryPrice->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
-        $deliveryPrice->delivery_comp_phone = $request->delivery_comp_phone;
-        $deliveryPrice->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
-        $deliveryPrice->status_id = 1;
-        $deliveryPrice->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+        $validator = Validator::make($request->all(), DeliveryPrice::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+        
+            
+              $deliveryPrice = new DeliveryPrice;
+              $deliveryPrice->delivery_comp_id = $delivery_comp_id;
+              $deliveryPrice->from_region_id = $request->from_region_id;
+              $deliveryPrice->to_region_id =$request->to_region_id;
+              $deliveryPrice->delivery_price_value =$request->delivery_price_value;
+              $deliveryPrice->delivery_price_weight_kilos =$request->delivery_price_weight_kilos;
+              $deliveryPrice->delivery_prices_description =$request->delivery_prices_description;
+              $deliveryPrice->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
     }
 
     /**
@@ -71,11 +79,27 @@ class DeliveryPriceControllerAPI extends Controller
      */
     public function update(DeliveryPriceRequest $request, DeliveryPrice $deliveryPrice)
     {
-        $this->authorize('update', $deliveryPrice);
-
-        $deliveryPrice->update($request->validated());
-
-        return new DeliveryPriceResource($deliveryPrice);
+        $validator = Validator::make($request->all(), DeliveryPrice::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+        
+            
+              $deliveryPrice = DeliveryPrice::find($request->deliveryPrice_id);
+              $deliveryPrice->delivery_comp_id = $delivery_comp_id;
+              $deliveryPrice->from_region_id = $request->from_region_id;
+              $deliveryPrice->to_region_id =$request->to_region_id;
+              $deliveryPrice->delivery_price_value =$request->delivery_price_value;
+              $deliveryPrice->delivery_price_weight_kilos =$request->delivery_price_weight_kilos;
+              $deliveryPrice->delivery_prices_description =$request->delivery_prices_description;
+              $deliveryPrice->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 

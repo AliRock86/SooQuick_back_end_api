@@ -33,23 +33,23 @@ class OtpControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), Otp::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
+            $validator = Validator::make($request->all(), Otp::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+        $Otp= new Otp;
+        $otp->user_id =$user_id;
+        $otp->verify_number = $request->verify_number;
+        $otp->save();
             return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-     
-     $Otp= new Otp;
-     $otp->user_id =$user_id;
-     $otp->verify_number = $request->verify_number;
-     $otp->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
@@ -76,11 +76,24 @@ class OtpControllerAPI extends Controller
      */
     public function update(OtpRequest $request, Otp $otp)
     {
-        $this->authorize('update', $otp);
+        $validator = Validator::make($request->all(), Otp::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+        $Otp= Otp::find($request->Otp_id);
+        $otp->user_id =$user_id;
+        $otp->verify_number = $request->verify_number;
+        $otp->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
-        $otp->update($request->validated());
-
-        return new OtpResource($otp);
 
     }
 

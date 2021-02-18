@@ -33,24 +33,24 @@ class OrderActionControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), OrderAction::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
+            $validator = Validator::make($request->all(), OrderAction::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+            $orderAction = new OrderAction;
+            $orderAction->order_id = $order_id;
+            $orderAction->action_id = $request->action_id;
+            $orderAction->status_id = $request->status_id;
+            $orderAction->save();
             return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-     
-        $orderAction = new OrderAction;
-        $orderAction->order_id = $order_id;
-        $orderAction->action_id = $request->action_id;
-        $orderAction->status_id = $request->status_id;
-        $orderAction->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
@@ -77,11 +77,24 @@ class OrderActionControllerAPI extends Controller
      */
     public function update(OrderActionRequest $request, OrderAction $orderAction)
     {
-        $this->authorize('update', $orderAction);
-
-        $orderAction->update($request->validated());
-
-        return new OrderActionResource($orderAction);
+            $validator = Validator::make($request->all(), OrderAction::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+            $orderAction = OrderAction::find($request->orderAction_id);
+            $orderAction->order_id = $order_id;
+            $orderAction->action_id = $request->action_id;
+            $orderAction->status_id = $request->status_id;
+            $orderAction->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
@@ -98,6 +111,18 @@ class OrderActionControllerAPI extends Controller
         $orderAction->delete();
 
         return new OrderActionResource($orderAction);
+
+        
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = OrderAction::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

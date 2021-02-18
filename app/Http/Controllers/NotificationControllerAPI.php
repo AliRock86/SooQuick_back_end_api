@@ -78,12 +78,25 @@ class NotificationControllerAPI extends Controller
      */
     public function update(NotificationRequest $request, Notification $notification)
     {
-        $this->authorize('update', $notification);
-
-        $notification->update($request->validated());
-
-        return new NotificationResource($notification);
-
+            $validator = Validator::make($request->all(), Notification::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+            $notification = Notification::find($request->notification_id);
+            $notification->user_id = $user->id;
+            $notification->notification_type_id = $request->notification_type_id;
+            $notification->notification_title = $request->notification_title;
+            $notification->notification_body = $request->notification_body;
+            $notification->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
     }
 
     /**

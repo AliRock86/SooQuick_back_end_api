@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Image;
+use App\Model\Image;
 use App\Http\Resources\ImageResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ImageRequest;
@@ -33,11 +33,25 @@ class ImageControllerAPI extends Controller
      */
     public function store(ImageRequest $request)
     {
-        $this->authorize('create', Image::class);
-
-        $image = Image::create($request->validated());
-
-        return new ImageResource($image);
+         
+        $validator = Validator::make($request->all(), Image::VALIDATION_RULE_STORE);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'success' => false,
+                        'data' => $validator->messages(),
+                    ], 400);
+                }
+                
+                    
+                $image = new Image;
+                $image->image_url = $image_url;
+                $image->imageable_id = $request->imageable_id;
+                $image->imageable_type =$request->imageable_type;
+                $image->save();
+                        return response()->json([
+                            'success' => true,
+                            'data' => 'done',
+                        ], 200);
 
     }
 
@@ -64,14 +78,25 @@ class ImageControllerAPI extends Controller
      */
     public function update(ImageRequest $request, Image $image)
     {
-        $this->authorize('update', $image);
-
-        $image->update($request->validated());
-
-        return new ImageResource($image);
-
-    }
-
+        $validator = Validator::make($request->all(), Image::VALIDATION_RULE_STORE);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'success' => false,
+                        'data' => $validator->messages(),
+                    ], 400);
+                }
+                
+                    
+                $image = Image::find($request->image_id);
+                $image->image_url = $image_url;
+                $image->imageable_id = $request->imageable_id;
+                $image->imageable_type =$request->imageable_type;
+                $image->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
+            }
     /**
      * Remove the specified resource from storage.
      *

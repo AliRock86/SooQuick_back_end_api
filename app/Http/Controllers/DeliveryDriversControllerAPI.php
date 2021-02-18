@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\DeliveryDrivers;
+use App\Model\DeliveryDrivers;
 use App\Http\Resources\DeliveryDriversResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryDriversRequest;
@@ -32,21 +32,27 @@ class DeliveryDriversControllerAPI extends Controller
      * @return \App\Http\Resources\DeliveryDriversResource
      */
     public function store(Request $request)
-    {
-        $user = JWTAuth::parseToken()->authenticate();
-        $deliveryDrivers = new DeliveryCompany;
-        $deliveryDrivers->user_id = $user->id;
-        $deliveryDrivers->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
-        $deliveryDrivers->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
-        $deliveryDrivers->delivery_comp_phone = $request->delivery_comp_phone;
-        $deliveryDrivers->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
-        $deliveryDrivers->status_id = 1;
-        $deliveryDrivers->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
-    }
+    
+        {
+            $validator = Validator::make($request->all(), DeliveryDrivers::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+            
+                
+                    $deliveryDrivers = new DeliveryCompany;
+                    $deliveryDrivers->driver_id = $driver_id;
+                    $deliveryDrivers->order_id = $request->order_id;
+                    $deliveryDrivers->status_id =$request->status_id;
+                    $deliveryDrivers->save();
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
+                }
 
     /**
      * Display the specified resource.
@@ -70,14 +76,28 @@ class DeliveryDriversControllerAPI extends Controller
      * @return \App\Http\Resources\DeliveryDriversResource
      */
     public function update(DeliveryDriversRequest $request, DeliveryDrivers $deliveryDrivers)
-    {
-        $this->authorize('update', $deliveryDrivers);
 
-        $deliveryDrivers->update($request->validated());
+        { 
+                $validator = Validator::make($request->all(), DeliveryDrivers::VALIDATION_RULE_STORE);
+                if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+                $deliveryDrivers = DeliveryCompany::find($request->deliveryDrivers_id);
+                $deliveryDrivers->driver_id = $driver_id;
+                $deliveryDrivers->order_id = $request->order_id;
+                $deliveryDrivers->status_id =$request->status_id;
+                $deliveryDrivers->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
-        return new DeliveryDriversResource($deliveryDrivers);
-
-    }
+        }
 
     /**
      * Remove the specified resource from storage.
@@ -92,6 +112,17 @@ class DeliveryDriversControllerAPI extends Controller
         $deliveryDrivers->delete();
 
         return new DeliveryDriversResource($deliveryDrivers);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = DeliveryDrivers::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

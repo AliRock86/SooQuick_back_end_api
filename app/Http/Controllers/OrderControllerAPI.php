@@ -33,24 +33,24 @@ class OrderControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), Order::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
+            $validator = Validator::make($request->all(), Order::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+        $order = new Order;
+        $order->order_id = $order_id;
+        $order->action_id = $request->action_id;
+        $order->status_id = $request->status_id;
+        $order->save();
             return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-     
-      $order = new Order;
-      $order->order_id = $order_id;
-      $order->action_id = $request->action_id;
-      $order->status_id = $request->status_id;
-      $order->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
@@ -76,14 +76,26 @@ class OrderControllerAPI extends Controller
      * @return \App\Http\Resources\OrderResource
      */
     public function update(OrderRequest $request, Order $order)
-    {
-        $this->authorize('update', $order);
-
-        $order->update($request->validated());
-
-        return new OrderResource($order);
-
-    }
+        {
+            $validator = Validator::make($request->all(), Order::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+        $order = Order::find($request->order_id);
+        $order->order_id = $order_id;
+        $order->action_id = $request->action_id;
+        $order->status_id = $request->status_id;
+        $order->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
+        }
 
     /**
      * Remove the specified resource from storage.
@@ -98,6 +110,17 @@ class OrderControllerAPI extends Controller
         $order->delete();
 
         return new OrderResource($order);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = Order::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

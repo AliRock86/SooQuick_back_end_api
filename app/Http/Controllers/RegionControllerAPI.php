@@ -78,11 +78,25 @@ class RegionControllerAPI extends Controller
      */
     public function update(RegionRequest $request, Region $region)
     {
-        $this->authorize('update', $region);
-
-        $region->update($request->validated());
-
-        return new RegionResource($region);
+        $validator = Validator::make($request->all(), Region::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        
+            $region= Region::find($request->region_id);
+            $region->user_id =$user_id;
+            $region->province_id = $request->province_id;
+            $region->region_name = $request->region_name;
+            $region->region_name_ar = $request->region_name_ar;
+            $region->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 

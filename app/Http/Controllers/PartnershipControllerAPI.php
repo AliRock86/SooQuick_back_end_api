@@ -42,15 +42,15 @@ class PartnershipControllerAPI extends Controller
         }
       
      
-    $partnership= new Partnership;
-    $partnership->user_id =$user_id;
-    $partnership->delivery_comp_id = $request->delivery_comp_id;
-    $partnership->merchant_id = $request->merchant_id;
-    $partnership->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+        $partnership= new Partnership;
+        $partnership->user_id =$user_id;
+        $partnership->delivery_comp_id = $request->delivery_comp_id;
+        $partnership->merchant_id = $request->merchant_id;
+        $partnership->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
     }
 
     /**
@@ -76,12 +76,24 @@ class PartnershipControllerAPI extends Controller
      */
     public function update(PartnershipRequest $request, Partnership $partnership)
     {
-        $this->authorize('update', $partnership);
-
-        $partnership->update($request->validated());
-
-        return new PartnershipResource($partnership);
-
+        $validator = Validator::make($request->all(), Partnership::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+        
+        
+        $partnership= Partnership::find($request->partnership_id);
+        $partnership->user_id =$user_id;
+        $partnership->delivery_comp_id = $request->delivery_comp_id;
+        $partnership->merchant_id = $request->merchant_id;
+        $partnership->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
     }
 
     /**

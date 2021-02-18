@@ -9,11 +9,13 @@ class Partnership extends Model
     public const VALIDATION_RULE_STORE = [
         'delivery_comp_id' => ['required','numeric'],
         'merchant_id' => ['required','numeric'],
+        'status_id' => ['required','numeric'],
     ];
     public const VALIDATION_RULE_UPDATE = [
         'id' => ['required','numeric'],
         'delivery_comp_id' => ['required','numeric'],
         'merchant_id' => ['required','numeric'],
+        'status_id' => ['required','numeric'],
     ];
     protected $guarded = [];
 
@@ -29,6 +31,11 @@ class Partnership extends Model
     public function deliveryComp()
     {
         return $this->belongsTo('App\Models\DeliveryComp');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo('App\Models\Status');
     }
 
 }

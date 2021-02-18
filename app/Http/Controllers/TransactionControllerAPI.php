@@ -42,16 +42,16 @@ class TransactionControllerAPI extends Controller
         }
       
         
-        $transaction= new Transaction;
-        $transaction->source_id =$source_id;
-        $transaction->destination_id = $request->destination_id;
-        $transaction->value = $request->value;
-        $transaction->save();
+            $transaction= new Transaction;
+            $transaction->source_id =$source_id;
+            $transaction->destination_id = $request->destination_id;
+            $transaction->value = $request->value;
+            $transaction->save();
 
-         return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
     }
 
     /**
@@ -77,11 +77,25 @@ class TransactionControllerAPI extends Controller
      */
     public function update(TransactionRequest $request, Transaction$transaction)
     {
-        $this->authorize('update',$transaction);
+        $validator = Validator::make($request->all(), Transaction::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+        
+            $transaction= Transaction::find($request->transaction_id);
+            $transaction->source_id =$source_id;
+            $transaction->destination_id = $request->destination_id;
+            $transaction->value = $request->value;
+            $transaction->save();
 
-       $transaction->update($request->validated());
-
-        return new TransactionResource($transaction);
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
