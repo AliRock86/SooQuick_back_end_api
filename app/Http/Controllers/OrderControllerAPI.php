@@ -140,6 +140,45 @@ class OrderControllerAPI extends Controller
 
      }
 
+      public function GetByMerchantId($merchant_id)
+     {
+        $merchant_id=(int)$merchant_id;
+        $user = JWTAuth::parseToken()->authenticate();
+           $order=Order::where('merchant_id','=',$merchant_id) 
+           ->where('status_id','=',15)           
+             ->doesntHave('BillsOrders')
+              ->where('delivery_comp_id','=',$user->DeliveryCompany->id)
+              -> whereDoesntHave('BillsOrders.Bill', function($query) {
+                $query->where('bill_type_id','=',1);
+              })
+             ->get();
+ 
+        return response()->json([
+            'success' => false,
+            'data' => new OrderCollection($order)
+        ], 200);
+     }
+
+
+
+     public function GetByDriverId($Driver_id)
+     {
+        $Driver_id=(int)$Driver_id;
+        $user = JWTAuth::parseToken()->authenticate();
+           $order=Order::where('status_id','=',15)  
+              ->WhereHas('DeliveryDriver', function ($query) use($Driver_id)  {$query->where('driver_id', '=',$Driver_id);})           
+              ->where('delivery_comp_id','=',$user->DeliveryCompany->id)
+              -> whereDoesntHave('BillsOrders.Bill', function($query) {
+                $query->where('bill_type_id','=',2);
+              })
+             ->get();
+ 
+        return response()->json([
+            'success' => false,
+            'data' => new OrderCollection($order)
+        ], 200);
+     }
+
      public function ChangeStatusByDeliveryComp(Request $request)
      {
 

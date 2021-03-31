@@ -8,6 +8,7 @@ use App\Models\CompanyDrivers;
 use App\Models\Partnership;
 use App\Http\Resources\CompanyDriversResource;
 use Validator;
+use App\Models\Order;
 use App\Http\Resources\DeliveryCompanyResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeliveryCompanyRequest;
@@ -30,6 +31,24 @@ class DeliveryCompanyControllerAPI extends Controller
         $deliveryCompany = DeliveryCompany::all();
 
         return new DeliveryCompanyCollection($deliveryCompany);
+
+    }
+
+
+    public function Dashbourd()
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+     
+        $count = [
+            'ordersAll' => Order::where('delivery_comp_id','=',$user->DeliveryCompany->id)->count(),
+            'ordersBind' => Order::where('delivery_comp_id','=',$user->DeliveryCompany->id)->where('status_id','=',9)->count(),
+            'DriverAll'=>CompanyDrivers::where('delivery_comp_id','=',$user->DeliveryCompany->id)->count(),
+            'OwnerAll'=>Partnership::where('delivery_comp_id','=',$user->DeliveryCompany->id)->count(),
+        ];
+        return response()->json([
+            'success' => true,
+            'data' => $count,
+        ], 200);
 
     }
 

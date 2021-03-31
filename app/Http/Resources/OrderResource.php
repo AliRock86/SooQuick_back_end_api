@@ -21,6 +21,7 @@ class OrderResource extends JsonResource
         'merchant'=>['id'=>$this->merchant->id,'merchant_barnd_name'=>$this->merchant->merchant_barnd_name,'merchant_email'=>$this->merchant->merchant_email,'merchant_phone'=>$this->merchant->merchant_phone,'region'=> new RegionResource($this->deliveryComp->region)],
         'delivery_comp'=>['id'=>$this->deliveryComp->id,'delivery_comp_barnd_name'=>$this->deliveryComp->delivery_comp_barnd_name,'delivery_comp_email'=>$this->deliveryComp->delivery_comp_email,'delivery_comp_phone'=>$this->deliveryComp->delivery_comp_phone],
         'DeliveryDriver'=>new DeliveryDriversResource($this->DeliveryDriver),
+        'deliveryPrice'=>['id'=>$this->deliveryPrice->id,'price'=>$this->deliveryPrice->delivery_price_value],
         'status'=>['id'=>$this->status->id,'status_name'=>$this->status->status_name,'status_name_ar'=>$this->status->status_name_ar,'status_color'=>$this->status->status_color],
         'created_at'=>$this->created_at->format('d-m-Y')
         ];

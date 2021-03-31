@@ -48,7 +48,9 @@ class PartnershipControllerAPI extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
 
-     $Partnerships=Partnership::where('delivery_comp_id','=',$request->delivery_comp_id)->get();
+     $Partnerships=Partnership::where('delivery_comp_id','=',$request->delivery_comp_id)
+     ->where('merchant_id','=',JWTAuth::parseToken()->authenticate()->merchant->id)
+     ->get();
     if(count($Partnerships)>0)
 
     {

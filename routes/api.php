@@ -17,6 +17,8 @@ use App\Http\Controllers\PartnershipControllerAPI;
 use App\Http\Controllers\DeliveryPriceControllerAPI;
 use App\Http\Controllers\OrderControllerAPI;
 use App\Http\Controllers\DeliveryDriversControllerAPI;
+use App\Http\Controllers\BillControllerAPI;
+
 
 
 /*
@@ -183,17 +185,30 @@ Route::name('deliveryCompanies.')->prefix('deliveryCompanies')->group(function (
     Route::patch('update', [DeliveryCompanyControllerAPI::class,'update'])->name('updateCompany');
     Route::get('/show', [DeliveryCompanyControllerAPI::class,'show'])->middleware(['jwt.auth.delivery']);
 
+
+    Route::get('/Dashbourd', [DeliveryCompanyControllerAPI::class,'Dashbourd'])->middleware(['jwt.auth.delivery']);
+
+
     Route::get('/allDrivers', [DeliveryCompanyControllerAPI::class,'GetAllDrivers'])->name('allDrivers');
     Route::post('/', [DriverControllerAPI::class,'store'])->name('createDriver');
-
+    
      
     Route::name('Orders.')->prefix('Orders')->group(function () {
         Route::get('/', [OrderControllerAPI::class,'GetDeliveryCompanyOrders'])->middleware(['jwt.auth.delivery']);
         Route::post('/changeStatus', [OrderControllerAPI::class,'ChangeStatusByDeliveryComp'])->middleware(['jwt.auth.delivery']);
+        Route::get('/GetByMerchantId/{merchant_id}', [OrderControllerAPI::class,'GetByMerchantId'])->middleware(['jwt.auth.delivery']);
+        Route::get('/GetByDriverId/{Driver_id}', [OrderControllerAPI::class,'GetByDriverId'])->middleware(['jwt.auth.delivery']);
+
+
+        
     });
 
     Route::get('/GetMerchants', [DeliveryCompanyControllerAPI::class,'GetMerchants'])->name('allMerchants');
+    Route::get('/bills', [BillControllerAPI::class,'GeyByDeliveryCompanyId'])->middleware(['jwt.auth.delivery']);
+    Route::get('/bills/Search', [BillControllerAPI::class,'SearchByDeliveryCom'])->middleware(['jwt.auth.delivery']);
 
+    
+ 
     Route::patch('/{driverId}', [DriverControllerAPI::class,'update'])->name('update');
     Route::get('/{driverId}', [DriverControllerAPI::class,'driverChangeStatus'])->name('driverChangeStatus');
     Route::get('/{phoneNumber}', [DriverControllerAPI::class,'search'])->name('driverSearch');
@@ -327,7 +342,7 @@ Route::name('notifications.')->prefix('notifications')->group(function () {
     Route::delete('/{notification}', 'NotificationControllerAPI@destroy')->name('destroy');
 });
 
-
+//http://127.0.0.1:7777/api/deliveryCompanies/Orders/GetByMerchantId/9
 
 /*
 |--------------------------------------------------------------------------
@@ -336,10 +351,10 @@ Route::name('notifications.')->prefix('notifications')->group(function () {
  */
 Route::name('bills.')->prefix('bills')->group(function () {
     Route::get('/', 'BillControllerAPI@index')->name('index');
-    Route::post('/', 'BillControllerAPI@store')->name('create');
+    Route::post('/store',  [BillControllerAPI::class,'store'])->middleware(['jwt.auth.delivery']);;
     Route::get('/{bill}', 'BillControllerAPI@show')->name('show');
     Route::patch('/{bill}', 'BillControllerAPI@update')->name('update');
-    Route::delete('/{bill}', 'BillControllerAPI@destroy')->name('destroy');
+    Route::delete('/delete/{bill_id}',[BillControllerAPI::class,'destroy'])->middleware(['jwt.auth.delivery']);
 });
 
 /*

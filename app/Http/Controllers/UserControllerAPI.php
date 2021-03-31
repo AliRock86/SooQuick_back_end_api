@@ -196,13 +196,31 @@ class UserControllerAPI extends Controller
                 ], 400);
             }
         }
+        $token = JWTAuth::getToken();
+        $token= JWTAuth::refresh($token);
+
         $user = User::find($user->id);
-        $user->status_id = 2;
+        $user->status_id =1;
         $user->save();
+
+        $data = [
+                
+            'id' => $user->id,
+            'token' => $token,
+            'id' => $user->id,
+            'user_name' => $user->full_name,
+            'user_phone' => $user->user_phone,
+            'user_image' => ($user->image) ? $user->image->image_url : null,
+            'user_email' => $user->user_email,
+            'user_role' => $user->role->role_name,
+            'user_status' => $user->status->status_name,
+            'item_num'=>0
+        
+    ];
 
         return response()->json([
             'success' => true,
-            'data' => 'user activated',
+            'data' => $data,
         ], 200);
     }
 

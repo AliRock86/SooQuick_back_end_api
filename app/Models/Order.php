@@ -25,6 +25,12 @@ class Order extends Model
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
     ];
+
+    public function BillsOrders()
+    {
+        return $this->hasMany('App\Models\BillsOrders');
+    }
+
     protected $guarded = [];
 
     protected $hidden = [

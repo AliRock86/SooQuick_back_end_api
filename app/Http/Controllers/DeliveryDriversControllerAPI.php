@@ -67,7 +67,7 @@ class DeliveryDriversControllerAPI extends Controller
         $Order= Order::whereIn('id',$request->order_id)->where('delivery_comp_id','=',$user->DeliveryCompany->id)->get();
             if(count($Order)>0)
             {
-            for($i=0;$i<=count($request->order_id);$i++)
+            for($i=0;$i<count($request->order_id);$i++)
             {
               
                 $DeliveryDrivers =new DeliveryDrivers();

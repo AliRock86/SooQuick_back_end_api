@@ -19,16 +19,11 @@ class DeliveryCompany extends Model
     ];
 
     public const VALIDATION_RULE_UPDATE = [
-      
-      
         'delivery_comp_barnd_name' => ['required'],
         'delivery_comp_phone' => ['numeric'],
         'delivery_comp_barnd_name' => ['required'],
-      
         'full_name' => ['required'],
-       // 'user_phone' => ['required','unique:users'],
         'region_id' => ['required'],
-     
         'images' => ['array'],
     ];
     protected $guarded = [];
