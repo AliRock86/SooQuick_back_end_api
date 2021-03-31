@@ -79,11 +79,26 @@ class TransferredOrdersControllerAPI extends Controller
      */
     public function update(TransferredOrdersRequest $request, TransferredOrders $transferredOrders)
     {
-        $this->authorize('update', $transferredOrders);
+        $validator = Validator::make($request->all(), TransferredOrders::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                
+            $transferredOrders= TransferredOrders::find($request->transferredOrders_id);
+            $transferredOrders->order_id =$order_id;
+            $transferredOrders->order_id = $request->order_id;
+            $transferredOrders->from_comp_id = $request->from_comp_id;
+            $transferredOrders->to_comp_id = $request->to_comp_id;
+            $transferredOrders->save();
 
-        $transferredOrders->update($request->validated());
-
-        return new TransferredOrdersResource($transferredOrders);
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 

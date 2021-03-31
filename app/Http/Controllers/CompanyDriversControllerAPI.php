@@ -184,12 +184,29 @@ public function changeStatusByDriver(Request $request)
 
     public function update(CompanyDriversRequest $request, CompanyDrivers $companyDrivers)
     {
-        $this->authorize('update', $companyDrivers);
+        $validator = Validator::make($request->all(), CompanyDrivers::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+                    
+                $companyDrivers=CompanyDrivers::find($request->companyDrivers_id);
+                $companyDrivers->addressable_id =$companyDriversable_id;
+                $companyDrivers->addressable_type = $request->addressable_type;
+                $companyDrivers->region_id = $request->region_id;
+                $companyDrivers->long = $request->long;
+                $companyDrivers->lat = $request->lat;
+                $companyDrivers->lat = $request->lat;
+                $companyDrivers->address_descraption = $request->address_descraption;
+                $companyDrivers->save();
 
-        $companyDrivers->update($request->validated());
-
-        return new CompanyDriversResource($companyDrivers);
-
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
     }
 
     /**

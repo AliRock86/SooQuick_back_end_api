@@ -13,6 +13,7 @@ class TransferOrderByDrivers extends Model
         'still_has_it' => [],
         'driver_id' => ['required','numeric'],
     ];
+    // still_has_it may be increment by one best chosen
 
     public const VALIDATION_RULE_UPDATE = [
         'id' => ['required','numeric'],

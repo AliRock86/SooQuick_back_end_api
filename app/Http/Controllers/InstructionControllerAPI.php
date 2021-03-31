@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Instruction;
+use App\Model\Instruction;
 use App\Http\Resources\InstructionResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InstructionRequest;
@@ -33,21 +33,25 @@ class InstructionControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $instruction= new DeliveryCompany;
-        $instruction->user_id = $user->id;
-        $instruction->delivery_comp_barnd_name = $request->delivery_comp_barnd_name;
-        $instruction->delivery_comp_email = ($request->delivery_comp_email) ? $request->delivery_comp_email : 'null';
-        $instruction->delivery_comp_phone = $request->delivery_comp_phone;
-        $instruction->delivery_comp_description =($request->delivery_comp_description) ? $request->delivery_comp_description : 'null';
-        $instruction->status_id = 1;
-        $instruction->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+            $validator = Validator::make($request->all(), Instruction::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+            
+                
+            $instruction = new Instruction;
+            $instruction->instruction_name = $instruction_name;
+            $instruction->instruction_name_ar = $request->instruction_name_ar;
+            $instruction->save();
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
 
-    }
+        }
 
     /**
      * Display the specified resource.
@@ -72,11 +76,23 @@ class InstructionControllerAPI extends Controller
      */
     public function update(InstructionRequest $request, Instruction $instruction)
     {
-        $this->authorize('update', $instruction);
-
-        $instruction->update($request->validated());
-
-        return new InstructionResource($instruction);
+            $validator = Validator::make($request->all(), Instruction::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+            
+                
+            $instruction = Instruction::find($request->instruction_id);
+            $instruction->instruction_name = $instruction_name;
+            $instruction->instruction_name_ar = $request->instruction_name_ar;
+            $instruction->save();
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
 
     }
 

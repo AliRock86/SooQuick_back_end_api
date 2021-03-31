@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
-
 use App\Models\DeliveryDrivers;
 use App\Models\Order;
 use App\Http\Requests\OrderRequest;
@@ -118,14 +116,28 @@ class DeliveryDriversControllerAPI extends Controller
      * @return \App\Http\Resources\DeliveryDriversResource
      */
     public function update(DeliveryDriversRequest $request, DeliveryDrivers $deliveryDrivers)
-    {
-        $this->authorize('update', $deliveryDrivers);
 
-        $deliveryDrivers->update($request->validated());
+        { 
+                $validator = Validator::make($request->all(), DeliveryDrivers::VALIDATION_RULE_STORE);
+                if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+                $deliveryDrivers = DeliveryCompany::find($request->deliveryDrivers_id);
+                $deliveryDrivers->driver_id = $driver_id;
+                $deliveryDrivers->order_id = $request->order_id;
+                $deliveryDrivers->status_id =$request->status_id;
+                $deliveryDrivers->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
-        return new DeliveryDriversResource($deliveryDrivers);
-
-    }
+        }
 
     /**
      * Remove the specified resource from storage.
@@ -140,6 +152,17 @@ class DeliveryDriversControllerAPI extends Controller
         $deliveryDrivers->delete();
 
         return new DeliveryDriversResource($deliveryDrivers);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = DeliveryDrivers::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

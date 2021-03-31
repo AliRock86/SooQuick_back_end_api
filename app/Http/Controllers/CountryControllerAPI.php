@@ -91,7 +91,7 @@ class CountryControllerAPI extends Controller
         }
       
                     
-                $country= new CompanyDrivers;
+                $country= CompanyDrivers ::find($request->country_id);
                 $country->addressable_id =$countryable_id;
                 $country->addressable_type = $request->addressable_type;
                 $country->region_id = $request->region_id;

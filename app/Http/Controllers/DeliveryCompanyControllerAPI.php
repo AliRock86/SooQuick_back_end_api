@@ -121,7 +121,7 @@ class DeliveryCompanyControllerAPI extends Controller
     }
 
 
-    public function update(Request $request)
+    public function update(DeliveryCompanyRequest $request , DeliveryCompany $deliveryCompany )
     {
         $validator = Validator::make($request->all(), DeliveryCompany::VALIDATION_RULE_UPDATE);
         if ($validator->fails()) {
@@ -193,6 +193,17 @@ class DeliveryCompanyControllerAPI extends Controller
         $deliveryCompany->delete();
 
         return new DeliveryCompanyResource($deliveryCompany);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = DeliveryCompany::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

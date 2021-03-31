@@ -15,8 +15,13 @@ class Order extends Model
         'customer_id' => ['required','numeric'],
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
+<<<<<<< HEAD
+        'serial_number' => [''],
+        'status_id' => ['required','numeric'],
+=======
         // 'serial_number' => ['required'],
        
+>>>>>>> 2bc26ce8f7752e0898979a5bd0e99678c22505f4
     ];
     public const VALIDATION_RULE_UPDATE = [
         'customer_id' => ['required','numeric'],
@@ -24,6 +29,11 @@ class Order extends Model
         'customer_id' => ['required','numeric'],
         'delivery_price_id' => ['required','numeric'],
         'product_price' => ['required','numeric'],
+<<<<<<< HEAD
+        'serial_number' => [''],
+        'status_id' => ['required','numeric'],
+=======
+>>>>>>> 2bc26ce8f7752e0898979a5bd0e99678c22505f4
     ];
 
     public function BillsOrders()

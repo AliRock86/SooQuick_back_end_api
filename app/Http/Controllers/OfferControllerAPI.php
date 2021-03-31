@@ -33,25 +33,25 @@ class OfferControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), Offer::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
+            $validator = Validator::make($request->all(), Offer::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+            $offer = new Offer;
+            $offer->merchant_id = $merchant_id;
+            $offer->region_id = $request->region_id;
+            $offer->status_id = $request->status_id;
+            $offer->notification_body = $request->notification_body;
+            $offer->save();
             return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-     
-        $offer = new Offer;
-        $offer->merchant_id = $merchant_id;
-        $offer->region_id = $request->region_id;
-        $offer->status_id = $request->status_id;
-        $offer->notification_body = $request->notification_body;
-        $offer->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
     /**
@@ -76,12 +76,26 @@ class OfferControllerAPI extends Controller
      * @return \App\Http\Resources\OfferResource
      */
     public function update(OfferRequest $request, Offer $offer)
-    {
-        $this->authorize('update', $offer);
-
-        $offer->update($request->validated());
-
-        return new OfferResource($offer);
+        {
+            $validator = Validator::make($request->all(), Offer::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+            $offer = Offer::find($request->offer_id);
+            $offer->merchant_id = $merchant_id;
+            $offer->region_id = $request->region_id;
+            $offer->status_id = $request->status_id;
+            $offer->notification_body = $request->notification_body;
+            $offer->save();
+            return response()->json([
+                'success' => true,
+                'data' => 'done',
+            ], 200);
 
     }
 
@@ -100,4 +114,17 @@ class OfferControllerAPI extends Controller
         return new OfferResource($offer);
 
     }
+    
+    public function changeStatus($statusId, $userId)
+    {
+        $u = Offer::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
+
+    }
+
 }

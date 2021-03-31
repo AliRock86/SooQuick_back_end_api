@@ -79,11 +79,26 @@ class TransferOrderByDriversControllerAPI extends Controller
      */
     public function update(TransferOrderByDriversRequest $request, TransferOrderByDrivers $transferOrderByDrivers)
     {
-        $this->authorize('update', $transferOrderByDrivers);
+        $validator = Validator::make($request->all(), TransferOrderByDrivers::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+            
+            $transferOrderByDrivers= TransferOrderByDrivers::find($request->transferOrderByDrivers_id);
+            $transferOrderByDrivers->order_id =$order_id;
+            $transferOrderByDrivers->driver_id = $request->driver_id;
+            $transferOrderByDrivers->still_has_it = $request->still_has_it;
+            $transferOrderByDrivers->status_id = $request->status_id;
+            $transferOrderByDrivers->save();
 
-        $transferOrderByDrivers->update($request->validated());
-
-        return new TransferOrderByDriversResource($transferOrderByDrivers);
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 
@@ -100,6 +115,17 @@ class TransferOrderByDriversControllerAPI extends Controller
         $transferOrderByDrivers->delete();
 
         return new TransferOrderByDriversResource($transferOrderByDrivers);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = TransferOrderByDrivers::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

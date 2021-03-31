@@ -41,15 +41,15 @@ class StatusTypeControllerAPI extends Controller
             ], 400);
         }
       
-        
-       $statusType= new StatusType;
-       $statusType->user_id =$user_id;
-       $statusType->status_type_name = $request->status_type_name;
-       $statusType->save();
-            return response()->json([
-                'success' => true,
-                'data' => 'done',
-            ], 200);
+            
+        $statusType= new StatusType;
+        $statusType->user_id =$user_id;
+        $statusType->status_type_name = $request->status_type_name;
+        $statusType->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 
@@ -76,12 +76,23 @@ class StatusTypeControllerAPI extends Controller
      */
     public function update(StatusTypeRequest $request, StatusType$statusType)
     {
-        $this->authorize('update',$statusType);
-
-    $statusTypeType->update($request->validated());
-
-        return new StatusTypeResource($statusType);
-
+        $validator = Validator::make($request->all(), StatusType::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+            
+        $statusType= StatusType::find($request->statusType_id);
+        $statusType->user_id =$user_id;
+        $statusType->status_type_name = $request->status_type_name;
+        $statusType->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
     }
 
     /**
@@ -97,6 +108,17 @@ class StatusTypeControllerAPI extends Controller
     $statusTypeType->delete();
 
         return new StatusTypeResource($statusType);
+
+    }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = Status::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
 
     }
 }

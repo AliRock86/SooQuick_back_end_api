@@ -76,11 +76,24 @@ class PriceControllerAPI extends Controller
      */
     public function update(PriceRequest $request, Price $price)
     {
-        $this->authorize('update', $price);
+        $validator = Validator::make($request->all(), Price::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+            
+            
+            $price= Price::find($request->price_id);
+            $price->user_id =$user_id;
+            $price->permision_name = $request->permision_name;
+            $price->save();
+                    return response()->json([
+                        'success' => true,
+                        'data' => 'done',
+                    ], 200);
 
-        $price->update($request->validated());
-
-        return new PriceResource($price);
 
     }
 

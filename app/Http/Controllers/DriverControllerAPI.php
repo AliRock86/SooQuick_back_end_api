@@ -225,4 +225,15 @@ class DriverControllerAPI extends Controller
         return new DriverResource($driver);
 
     }
+    public function changeStatus($statusId, $userId)
+    {
+        $u = Driver::find($userId);
+        $u->status_id = $statusId;
+        $u->save();
+        return response()->json([
+            'success' => true,
+            'data' => 'done',
+        ], 200);
+
+    }
 }

@@ -43,14 +43,14 @@ class RoleControllerAPI extends Controller
         }
       
      
-    $role= new Role;
-    $role->user_id =$user_id;
-    $role->role_name = $request->role_name;
-    $role->save();
-         return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+            $role= new Role;
+            $role->user_id =$user_id;
+            $role->role_name = $request->role_name;
+            $role->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 
@@ -77,11 +77,22 @@ class RoleControllerAPI extends Controller
      */
     public function update(RoleRequest $request, Role $role)
     {
-        $this->authorize('update', $role);
-
-        $role->update($request->validated());
-
-        return new RoleResource($role);
+        $validator = Validator::make($request->all(), Role::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+      
+            $role= Role::find($request->role_id);
+            $role->user_id =$user_id;
+            $role->role_name = $request->role_name;
+            $role->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 

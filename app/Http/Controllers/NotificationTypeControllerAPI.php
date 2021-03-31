@@ -33,23 +33,22 @@ class NotificationTypeControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), NotificationType::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-        $user = JWTAuth::parseToken()->authenticate();
-       $notificationType = new Notification;
-       $notificationType->user_id = $user->id;
-       $notificationType->notification_type_name = $request->notification_type_name;
-       $notificationType->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+                $validator = Validator::make($request->all(), NotificationType::VALIDATION_RULE_STORE);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'success' => false,
+                        'data' => $validator->messages(),
+                    ], 400);
+                }
+                
+                $notificationType = Notification::find($request->notificationType);
+                $notificationType->notification_type_name = $request->notification_type_name;
+                $notificationType->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
+    
 
 
     }
@@ -75,13 +74,24 @@ class NotificationTypeControllerAPI extends Controller
      * @param  \App\NotificationType $notificationTypeType
      * @return \App\Http\Resources\NotificationTypeResource
      */
-    public function update(NotificationTypeRequest $request, NotificationType$notificationTypeType)
-    {
-        $this->authorize('update',$notificationTypeType);
-
-       $notificationTypeType->update($request->validated());
-
-        return new NotificationTypeResource($notificationType);
+    public function update(NotificationTypeRequest $request, NotificationType $notificationType)
+        {
+            $validator = Validator::make($request->all(), NotificationType::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+           $notificationType = Notification::find($request->notificationType);
+           $notificationType->notification_type_name = $request->notification_type_name;
+           $notificationType->save();
+              return response()->json([
+                'success' => true,
+                'data' => 'done',
+             ], 200);
 
     }
 

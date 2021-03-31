@@ -33,23 +33,23 @@ class OrderInstructionControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), OrderInstruction::VALIDATION_RULE_STORE);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'data' => $validator->messages(),
-            ], 400);
-        }
-      
-     
-     $orderInstruction = new OrderInstruction;
-     $orderInstruction->order_id =$orderInstruction_id;
-     $orderInstruction->instruction_id = $request->instruction_id;
-     $orderInstruction->save();
-        return response()->json([
-            'success' => true,
-            'data' => 'done',
-        ], 200);
+            $validator = Validator::make($request->all(), OrderInstruction::VALIDATION_RULE_STORE);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator->messages(),
+                ], 400);
+            }
+        
+        
+            $orderInstruction = new OrderInstruction;
+            $orderInstruction->order_id =$orderInstruction_id;
+            $orderInstruction->instruction_id = $request->instruction_id;
+            $orderInstruction->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 
@@ -76,11 +76,23 @@ class OrderInstructionControllerAPI extends Controller
      */
     public function update(OrderInstructionRequest $request, OrderInstruction$orderInstructionInstruction)
     {
-        $this->authorize('update',$orderInstructionInstruction);
-
-       $orderInstructionInstruction->update($request->validated());
-
-        return new OrderInstructionResource($orderInstruction);
+        $validator = Validator::make($request->all(), OrderInstruction::VALIDATION_RULE_STORE);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'data' => $validator->messages(),
+            ], 400);
+        }
+    
+        
+            $orderInstruction = OrderInstruction::find($request->orderInstruction_id);
+            $orderInstruction->order_id =$orderInstruction_id;
+            $orderInstruction->instruction_id = $request->instruction_id;
+            $orderInstruction->save();
+                return response()->json([
+                    'success' => true,
+                    'data' => 'done',
+                ], 200);
 
     }
 

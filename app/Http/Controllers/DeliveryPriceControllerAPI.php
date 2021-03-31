@@ -33,7 +33,6 @@ class DeliveryPriceControllerAPI extends Controller
      */
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), DeliveryPrice::VALIDATION_RULE_STORE);
         if ($validator->fails()) {
             return response()->json([
@@ -84,7 +83,6 @@ class DeliveryPriceControllerAPI extends Controller
      */
     public function update(Request $request,$id)
     {
-
         $validator = Validator::make($request->all(), DeliveryPrice::VALIDATION_RULE_STORE);
         if ($validator->fails()) {
             return response()->json([
